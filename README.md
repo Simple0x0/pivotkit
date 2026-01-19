@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PivotKit
 
-## Getting Started
+PivotKit is **not a pivoting tool**.  
+PivotKit is a **deterministic command generator** for network pivoting operations.
 
-First, run the development server:
+It consumes **normalized parameters** and outputs **fully rendered, ready‑to‑execute commands** for specific pivoting tools, based strictly on their **technical category and constraints**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+PivotKit is part of the **NetPivot‑X** project.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Core Principle
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> **Same input → same output. No interpretation. No prose. No guesswork.**
 
-## Learn More
+PivotKit does **not**:
+- Execute commands
+- Deploy payloads
+- Maintain sessions
+- Act as a C2
+- Perform discovery or validation
 
-To learn more about Next.js, take a look at the following resources:
+PivotKit **only** generates commands.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Input Model (Normalized)
 
-## Deploy on Vercel
+All tools consume the same normalized parameter set.  
+Unused parameters are ignored by tools that do not require them.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Required Parameters
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `attacker_ip`
+- `attacker_ports`
+- `target_ip`
+- `target_ports`
+- `pivot_network`
+- `cidr`
+
+### Optional Parameters
+
+- `interface`
+- `protocol`
+- `os`
+- `privilege_level`
+- `mode` (reverse / bind)
+- `transport` (tun / socks / relay)
+- `notes` (ignored by generator)
+
+---
+
+## Output Model
+
+PivotKit outputs:
+
+- Fully rendered commands
+- Tool‑specific syntax
+- Correct flag ordering
+- Context‑aware mode selection
+- No explanations, no comments, no markdown
+
+Example output:
