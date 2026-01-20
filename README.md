@@ -60,4 +60,13 @@ PivotKit outputs:
 - Context‑aware mode selection
 - No explanations, no comments, no markdown
 
-Example output:
+**Architecture**
+
+[Server] Layout.tsx
+    ├─ ToolMenu (server component)
+    └─ UserInputs (client component)  ← persistent across pages
+[Server] page.tsx (/)
+    └─ Workspace placeholder (optional)
+[Server] /tools/[tool]/page.tsx
+    ├─ Tool-specific Workspace (client component)
+    └─ Receives inputs from UserInputs (via React context or state lift)

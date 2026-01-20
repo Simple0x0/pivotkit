@@ -1,31 +1,11 @@
-import ToolSidebar from "@/app/components/ToolSidebar";
-import ToolWorkspacePlaceholder from "@/app/components/ToolWorkspacePlaceholder";
+import Workspace from "@/app/components/Workspace";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <div className="grid grid-cols-12 min-h-screen">
-
-        {/* Left Menu */}
-        <ToolSidebar />
-
-        {/* Main Workspace */}
-        <main className="col-span-8 p-6">
-          <h1 className="text-2xl font-semibold mb-2">
-            Welcome to PivotKit
-          </h1>
-          <p className="text-zinc-400 mb-6">
-            Select a tool from the left to view its inputs, outputs, and commands.
-          </p>
-
-          <ToolWorkspacePlaceholder />
-        </main>
-
-        {/* Right Visual Panel (reserved) */}
-        <aside className="col-span-2 border-l border-zinc-800 p-4 text-zinc-500 text-sm">
-          Visuals placeholder
-        </aside>
-
+    <div className="w-full flex justify-center">
+      {/* Workspace placeholder until a tool is selected */}
+      <div className="w-full lg:w-4/5">
+        <Workspace />
       </div>
     </div>
   );

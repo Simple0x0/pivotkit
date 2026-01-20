@@ -1,39 +1,19 @@
-import { ToolInput } from "@/app/types/tool";
+export function isValidIP(value: string): boolean {
+  const parts = value.split(".");
+  if (parts.length !== 4) return false;
 
-export function validateInputs(
-  schema: Record<string, ToolInput>,
-  values: Record<string, any>
-): Record<string, string> {
-  const errors: Record<string, string> = {};
-
-  for (const [key, input] of Object.entries(schema)) {
-    const value = values[key] ?? input.default;
-
-    if (input.required && !value) {
-      errors[key] = "This field is required";
-      continue;
-    }
-
-    if (!value) continue;
-
-    switch (input.type) {
-      case "ip":
-        if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value))
-          errors[key] = "Invalid IP address";
-        break;
-
-      case "port":
-        const port = Number(value);
-        if (isNaN(port) || port < 1 || port > 65535)
-          errors[key] = "Invalid port number";
-        break;
-
-      case "cidr":
-        if (!/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(value))
-          errors[key] = "Invalid CIDR notation";
-        break;
-    }
-  }
-
-  return errors;
+  return parts.every((p) => {
+    const n = Number(p);
+    return Number.isInteger(n) && n >= 0 && n <= 255;
+  });
 }
+
+export function isValidPort(value: number): boolean {
+  return Number.isInteger(value) && value > 0 && value <= 65535;
+}
+
+export function isValidCIDR(value: string | number): boolean {
+  const num = typeof value === "string" ? Number(value.replace("/", "")) : value;
+  return Number.isInteger(num) && num >= 0 && num <= 32;
+}
+
