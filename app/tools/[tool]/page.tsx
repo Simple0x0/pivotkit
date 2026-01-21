@@ -1,5 +1,5 @@
 import { loadTools, loadToolById } from "@/app/lib/toolLoader";
-import Workspace from "@/app/components/Workspace";
+import MainWorkspace from "@/app/components/MainWorkspace";
 import { notFound } from "next/navigation";
 
 export const dynamicParams = false;
@@ -20,10 +20,9 @@ export default async function ToolPage({ params }: Props) {
 
   return (
     <>
+      <MainWorkspace tool={tool} />
       <h1 className="text-2xl font-semibold mb-2">{toolData.name}</h1>
       <p className="text-zinc-400 mb-6">{toolData.description}</p>
-
-      <Workspace tool={tool} />
     </>
   );
 }

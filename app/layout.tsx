@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { UserInputsProvider } from "@/app/context/UserInputsContext";
-import UserInputs from "@/app/components/UserInputs";
 import ToolMenu from "@/app/components/ToolMenu";
 import { loadTools } from "@/app/lib/toolLoader";
 
@@ -33,8 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-zinc-950 text-zinc-100">
-        <UserInputsProvider>
-          <div className="min-h-screen flex justify-center p-3">
+        <div className="min-h-screen flex justify-center p-3">
             <div className="w-full lg:w-4/5 bg-zinc-900 rounded-2xl shadow-lg flex">
 
               {/* Main Content */}
@@ -45,7 +42,6 @@ export default function RootLayout({
 
               <section className="mx-auto w-full lg:w-4/5 flex flex-col gap-6">
                 <ToolMenu tools={tools} />
-                <UserInputs tools={tools} />
                 {children}
               </section>
             </main>
@@ -66,7 +62,6 @@ export default function RootLayout({
 
           </div>
         </div>
-        </UserInputsProvider>
       </body>
     </html>
   );

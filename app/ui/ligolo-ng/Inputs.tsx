@@ -93,7 +93,7 @@ export default function LigoloInputs({
               )}
             </div>
 
-            {/* Body: Responsive Grid */}
+            {/* Body */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Attacker */}
               <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 space-y-3 shadow-lg">
@@ -134,7 +134,15 @@ export default function LigoloInputs({
                 />
 
                 <div className="flex flex-wrap gap-2">
-                  
+                  {idx > 0 && (
+                    <PortInput
+                      label="Target Port"
+                      value={pivot.targetPort}
+                      onChange={(v) => updatePivot(idx, { targetPort: v })}
+                      info="Port exposed by the previous relay"
+                    />
+                  )}
+
                   <OSInput
                     label="OS"
                     value={pivot.targetOS ?? "Linux"}
