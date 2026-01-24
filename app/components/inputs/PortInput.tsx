@@ -7,12 +7,14 @@ export function PortInput({
   label,
   value,
   onChange,
-  info, // optional tooltip text
+  info,
+  className = "",
 }: {
   label: string;
   value: number;
   onChange: (v: number) => void;
   info?: string;
+  className?: string;
 }) {
   const safeValue = Number.isFinite(value) ? value : 0;
   const isValid = isValidPort(safeValue);
@@ -25,13 +27,11 @@ export function PortInput({
   };
 
   return (
-    <div className="flex flex-col w-44 gap-1">
+    <div className={`flex flex-col mb-4 w-full sm:w-auto ${className}`}>
       <label className="text-xs font-medium text-zinc-400">{label}</label>
 
-      {/* Group container: input + buttons + tooltip */}
       <div className="flex items-center gap-2">
-        <div className="flex items-center border border-zinc-700 rounded-lg bg-zinc-900 overflow-hidden">
-          {/* Decrement button */}
+        <div className="flex items-center border border-zinc-700 rounded-lg bg-zinc-900 overflow-hidden ">
           <button
             type="button"
             onClick={decrement}
@@ -41,7 +41,6 @@ export function PortInput({
             -
           </button>
 
-          {/* Input */}
           <input
             type="text"
             value={safeValue}
@@ -55,7 +54,6 @@ export function PortInput({
             `}
           />
 
-          {/* Increment button */}
           <button
             type="button"
             onClick={increment}
@@ -66,11 +64,9 @@ export function PortInput({
           </button>
         </div>
 
-        {/* Tooltip after the input group */}
         {info && <InfoTooltip text={info} />}
       </div>
 
-      {/* Validation message */}
       {!isValid && (
         <span className="text-[10px] text-red-400 mt-1">
           Port must be 1–65535

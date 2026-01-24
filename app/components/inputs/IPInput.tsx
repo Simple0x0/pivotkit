@@ -9,21 +9,21 @@ export function IPInput({
   onChange,
   info,
   placeholder,
+  className = "",
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   info?: string;
   placeholder?: string;
+  className?: string;
 }) {
   const isValid = value === "" || isValidIP(value);
 
   return (
-    <div className="flex flex-col w-3/5 mb-4">
-      {/* Label */}
+    <div className={`flex flex-col mb-4 w-full sm:w-auto ${className}`}>
       <label className="mb-1 text-xs font-medium text-zinc-400">{label}</label>
 
-      {/* Input wrapper with tooltip at the end */}
       <div className="relative">
         <input
           type="text"
@@ -36,12 +36,12 @@ export function IPInput({
             px-3 py-2 pr-8
             text-sm text-white
             placeholder-zinc-500
-            focus:outline-none focus:ring-2
+            focus:outline-none
+            focus:ring-1 focus:ring-slate-500
+            focus:border-slate-500
             transition duration-200
             shadow-sm
-            ${isValid
-              ? "border-zinc-900  hover:border-zinc-900"
-              : "border-red-500 focus:ring-red-500"}
+            ${isValid ? "border-zinc-900 hover:border-zinc-700" : "border-red-500 focus:ring-red-500 focus:border-red-500"}
           `}
           placeholder={placeholder}
         />

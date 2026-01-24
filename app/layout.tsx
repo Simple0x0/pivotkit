@@ -20,7 +20,6 @@ export const metadata: Metadata = {
   description: "Deterministic network pivoting command generator for penetration testers",
 };
 
-
 export default function RootLayout({
   children,
 }: {
@@ -32,10 +31,11 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-zinc-950 text-zinc-100">
         <div className="min-h-screen flex justify-center p-3">
-            <div className="w-full lg:w-4/5 bg-zinc-900 rounded-2xl shadow-lg flex">
+          {/* Use flex-col on small screens, flex-row on lg */}
+          <div className="w-full lg:w-4/5 bg-zinc-900 rounded-2xl shadow-lg flex flex-col lg:flex-row">
 
-              {/* Main Content */}
-              <main className="flex-1 p-6">
+            {/* Main Content */}
+            <main className="flex-1 p-6">
               <header className="text-center mb-6">
                 <h1 className="text-4xl font-semibold">Pivoting ToolKits</h1>
               </header>
@@ -47,7 +47,7 @@ export default function RootLayout({
             </main>
 
             {/* Reserved Right Panel */}
-            <aside className="w-64 border-l border-zinc-800 p-4 text-sm text-zinc-500">
+            <aside className="w-full lg:w-64 border-t lg:border-t-0 lg:border-l border-zinc-800 p-4 text-sm text-zinc-500 mt-4 lg:mt-0">
               This area is intended for{" "}
               <strong className="text-gray-400">Network Visual Maps</strong>.
               <br />
