@@ -6,38 +6,25 @@ export type ToolCategory =
   | "port-forward"
   | "c2";
 
-export type InputType =
-  | "ip"
-  | "port"
-  | "cidr"
-  | "string"
-  | "boolean";
+export type ToolCapability =
+  | "multi-hop"
+  | "tun-interface"
+  | "port-forward"
+  | "reverse-connection"
+  | "bind-connection"
+  | "requires-agent";
 
-export interface ToolInput {
-  label?: string;
-  type: InputType;
-  required?: boolean;
-  default?: string | number | boolean;
-  description?: string;
-}
-
-export interface ToolCommandBlock {
-  attacker?: string[];
-  target?: string[];
-  post?: string[];
-}
 
 export interface ToolDefinition {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   category: ToolCategory;
   os: {
     attacker: OSType[];
     target: OSType[];
   };
   requires_root?: boolean;
-  inputs: Record<string, ToolInput>;
-  commands: ToolCommandBlock;
+  capabilities: ToolCapability[];
   notes?: string[];
 }

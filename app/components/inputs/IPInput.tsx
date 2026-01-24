@@ -7,12 +7,14 @@ export function IPInput({
   label,
   value,
   onChange,
-  info, // optional tooltip text
+  info,
+  placeholder,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   info?: string;
+  placeholder?: string;
 }) {
   const isValid = value === "" || isValidIP(value);
 
@@ -41,7 +43,7 @@ export function IPInput({
               ? "border-zinc-900  hover:border-zinc-900"
               : "border-red-500 focus:ring-red-500"}
           `}
-          placeholder="e.g. 10.10.10.1"
+          placeholder={placeholder}
         />
 
         {info && (

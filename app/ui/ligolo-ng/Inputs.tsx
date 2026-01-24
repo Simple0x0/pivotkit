@@ -4,22 +4,27 @@ import { IPInput } from "@/app/components/inputs/IPInput";
 import { PortInput } from "@/app/components/inputs/PortInput";
 import { OSInput } from "@/app/components/inputs/OSInput";
 import { CIDRInput } from "@/app/components/inputs/CIDRInput";
+import { isValidCIDR } from "@/app/lib/validators";
 
-const isValidCIDR = (cidr: number | string) => {
-  const n = Number(cidr);
-  return Number.isInteger(n) && n >= 0 && n <= 32;
+/* ---------------- Validation ---------------- */
+const isPivotValid = (pivot: any) => {
+  if (!pivot.attackerPort) return false;
+  if (!pivot.network) return false;
+  if (!isValidCIDR(pivot.cidr)) return false;
+
+  // Relay pivots require explicit target info
+  if (pivot.role === "relay") {
+    if (!pivot.targetIP) return false;
+    if (!pivot.targetPort) return false;
+  }
+
+  // Entry pivot must have the entry host IP
+  if (pivot.role === "entry" && !pivot.attackerBindIP) return false;
+
+  return true;
 };
 
-const isRelayValid = (pivot: any) => {
-  return (
-    pivot.attackerIP &&
-    pivot.targetIP &&
-    pivot.network &&
-    Number(pivot.attackerPort) > 0 &&
-    Number(pivot.targetPort) > 0 &&
-    isValidCIDR(pivot.cidr)
-  );
-};
+/* ---------------- Component ---------------- */
 
 export default function LigoloInputs({
   pivots,
@@ -35,7 +40,7 @@ export default function LigoloInputs({
   const lastPivotValid =
     pivots.length === 0
       ? true
-      : isRelayValid(pivots[pivots.length - 1]);
+      : isPivotValid(pivots[pivots.length - 1]);
 
   return (
     <div className="space-y-8">
@@ -66,9 +71,10 @@ export default function LigoloInputs({
         </span>
       </div>
 
-      {/* Relay Cards */}
+      {/* Pivot Cards */}
       {pivots.map((pivot, idx) => {
         const isLast = idx === pivots.length - 1;
+        const isEntry = pivot.role === "entry";
 
         return (
           <div
@@ -78,12 +84,10 @@ export default function LigoloInputs({
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-sm font-semibold">
-                {idx === 0
-                  ? "Entry Pivot (TUN)"
-                  : `Relay Pivot #${idx}`}
+                {isEntry ? "Entry Pivot (TUN)" : `Relay Pivot #${idx}`}
               </h3>
 
-              {isLast && pivots.length > 1 && (
+              {!isEntry && isLast && pivots.length > 1 && (
                 <button
                   onClick={() => removePivot(idx)}
                   className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition"
@@ -94,80 +98,128 @@ export default function LigoloInputs({
             </div>
 
             {/* Body */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-2 ${
+                isEntry ? "lg:grid-cols-2" : "lg:grid-cols-3"
+              } gap-6`}
+            >
               {/* Attacker */}
               <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 space-y-3 shadow-lg">
-                <h4 className="text-xs font-bold text-zinc-400">Attacker</h4>
+                <h4 className="text-xs font-bold text-zinc-100">Attacker</h4>
 
-                <IPInput
-                  label="Attacker IP"
-                  value={pivot.attackerIP}
-                  onChange={(v) => updatePivot(idx, { attackerIP: v })}
-                  info="Address the Ligolo proxy binds to. Usually 0.0.0.0 to listen on all interfaces."
-                />
+                {/* Entry pivot: show entry host IP instead of bind */}
+                {isEntry && (
+                  <IPInput
+                    label="Attacker Listener IP"
+                    value={pivot.attackerBindIP}
+                    onChange={(v) => updatePivot(idx, { attackerBindIP: v })}
+                    info="IP address of the attacker machine for ligolo proxy to listen on, Usually 0.0.0.0 to accept connection from any interface."
+                    placeholder="e.g. 0.0.0.0"
+                  />
+                )}
+              {/* 
+                {!isEntry && (
+                  <IPInput
+                    label="Attacker Bind IP"
+                    value={pivot.attackerBindIP}
+                    onChange={() => {}}
+                    info="Internal relay pivot: always binds to 127.0.0.1 for local connections. Not editable."
+                    placeholder="127.0.0.1"
+                  />
+                )} */}
 
                 <div className="flex flex-wrap gap-2">
                   <PortInput
                     label="Listener Port"
                     value={pivot.attackerPort}
-                    onChange={(v) => updatePivot(idx, { attackerPort: v })}
-                    info="The port the attacker is listening on"
+                    onChange={(v) =>
+                      updatePivot(idx, { attackerPort: v })
+                    }
+                    info={
+                      isEntry
+                        ? "A Port for ligolo proxy to listen on (default: 11601)."
+                        : "Attacker local port which ligolo agent to forward's traffics to. (You can leave as default)"
+                    }
                   />
                   <OSInput
-                    label="OS"
-                    value={pivot.attackerOS ?? "Linux"}
-                    onChange={(v) => updatePivot(idx, { attackerOS: v })}
-                    info="The operating system of the attacker machine"
+                    label="Attacker OS"
+                    value={pivot.attackerOS}
+                    onChange={(v) =>
+                      updatePivot(idx, { attackerOS: v })
+                    }
+                    info="Operating system of the attacker machine (default: linux)."
                   />
                 </div>
               </div>
 
-              {/* Target */}
-              <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 space-y-3 shadow-lg">
-                <h4 className="text-xs font-bold text-zinc-400">Target</h4>
+              {/* Target (relay only) */}
+              {!isEntry && (
+                <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 space-y-3 shadow-lg">
+                  <h4 className="text-xs font-bold text-zinc-100">Target</h4>
 
-                <IPInput
-                  label="Target IP"
-                  value={pivot.targetIP}
-                  onChange={(v) => updatePivot(idx, { targetIP: v })}
-                  info="IP of the target machine"
-                />
+                  <IPInput
+                    label="Compromised Host IP"
+                    value={pivot.targetIP}
+                    onChange={(v) =>
+                      updatePivot(idx, { targetIP: v })
+                    }
+                    info={`IP address of the previously compromised (Relay ${idx}) host that provides access to the newly discovered network.`}
+                    placeholder="e.g. 10.10.30.1"
+                  />
 
-                <div className="flex flex-wrap gap-2">
-                  {idx > 0 && (
+                  <div className="flex flex-wrap gap-2">
                     <PortInput
                       label="Target Port"
                       value={pivot.targetPort}
-                      onChange={(v) => updatePivot(idx, { targetPort: v })}
-                      info="Port exposed by the previous relay"
+                      onChange={(v) =>
+                        updatePivot(idx, { targetPort: v })
+                      }
+                      info="A port that will be exposed on the previously compromised host to relay traffic back to the attacker."
                     />
-                  )}
 
-                  <OSInput
-                    label="OS"
-                    value={pivot.targetOS ?? "Linux"}
-                    onChange={(v) => updatePivot(idx, { targetOS: v })}
-                    info="The operating system of the target machine"
-                  />
+                    <OSInput
+                      label="Target OS"
+                      value={pivot.targetOS}
+                      onChange={(v) =>
+                        updatePivot(idx, { targetOS: v })
+                      }
+                      info="Operating system of the previously compromised host"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Routed Network */}
               <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 space-y-3 shadow-lg">
-                <h4 className="text-xs font-bold text-zinc-400">Routed Network</h4>
+                <h4 className="text-xs font-bold text-zinc-100">
+                  Routed Network
+                </h4>
 
                 <IPInput
                   label="Network IP"
                   value={pivot.network}
                   onChange={(v) => updatePivot(idx, { network: v })}
-                  info="The network that will be routed through this pivot."
+                  info="The new network that will be routed through this pivot."
+                  placeholder="e.g. 10.10.30.0"
                 />
 
                 <CIDRInput
-                  value={pivot.cidr ?? 24}
+                  value={pivot.cidr}
                   onChange={(v) => updatePivot(idx, { cidr: v })}
-                  info="The CIDR notation for the routed network."
+                  info="CIDR notation for the new network to be routed (e.g. 24)."
                 />
+
+                {/* Entry pivot: target OS lives here */}
+                {isEntry && (
+                  <OSInput
+                    label="Target OS"
+                    value={pivot.targetOS}
+                    onChange={(v) =>
+                      updatePivot(idx, { targetOS: v })
+                    }
+                    info="Operating system of hosts in the routed network."
+                  />
+                )}
               </div>
             </div>
 

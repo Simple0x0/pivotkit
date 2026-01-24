@@ -1,9 +1,9 @@
-// app/ui/ligolo-ng/LigoloWorkspace.tsx
 "use client";
 
 import { usePivotChain } from "@/app/hooks/usePivotChain";
 import LigoloInputs from "./Inputs";
-import LigoloCommands from "./Commands";
+import LigoloCommands from "./CommandsDisplay";
+import { resolvePivotCommands } from "./CommandResolver"; 
 
 export default function LigoloWorkspace() {
   const {
@@ -11,8 +11,9 @@ export default function LigoloWorkspace() {
     updatePivot,
     addPivot,
     removePivot,
-  } = usePivotChain(1);
+  } = usePivotChain();
 
+  const resolvedCommands = resolvePivotCommands(pivots);
   return (
     <div className="space-y-10">
       <LigoloInputs
@@ -22,9 +23,7 @@ export default function LigoloWorkspace() {
         removePivot={removePivot}
       />
 
-      <LigoloCommands pivots={pivots} />
+      <LigoloCommands pivots={pivots} resolvedCommands={resolvedCommands}/>
     </div>
   );
 }
-
-

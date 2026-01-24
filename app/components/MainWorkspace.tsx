@@ -1,5 +1,3 @@
-"use client";
-
 import ToolWorkspacePlaceholder from "@/app/components/ToolWorkspacePlaceholder";
 import LigoloWorkspace from "@/app/ui/ligolo-ng/Workspace";
 
