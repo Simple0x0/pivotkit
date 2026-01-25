@@ -5,6 +5,8 @@ description: >
   Supports chained (multi-hop) pivoting with explicit execution order
   for attacker and compromised hosts.
 
+image: /public/ligolo-ng.png
+
 category: tun
 
 os:
@@ -89,3 +91,23 @@ notes:
   - One TUN interface is required per pivot depth.
   - Each new pivot repeats the same execution order with new parameters.
   - Listener must be created before connecting the next agent.
+
+keywords:
+  - ligolo-ng
+  - ligolo
+  - network pivoting
+  - tun pivoting
+  - tunneling
+  - lateral movement
+  - red team tooling
+  - penetration testing
+  - internal network access
+  - multi-hop pivoting
+  - post-exploitation
+  - agent-based pivoting
+  - tun interface
+  - compromised host routing
+  - offensive security
+  - adversary simulation
+
+

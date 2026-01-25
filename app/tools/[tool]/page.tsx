@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import React from "react";
 
 export const dynamicParams = false;
+const DEFAULT_IMAGE = "/public/ligolo-ng.png";
 
 export function generateStaticParams() {
   return loadTools().map((tool) => ({ tool: tool.id }));
@@ -22,13 +23,14 @@ export async function generateMetadata(
 
   const title = `${toolData.name} | PivotKit`;
   const description = toolData.description;
-
+  const image = toolData.image ?? DEFAULT_IMAGE;
+  console.log("Generating metadata for", tool, "with image", image);
   return {
     title,
     description,
     keywords: toolData.keywords ?? [
       "pivoting",
-      `{toolData.name}`,
+      toolData.name,
       "red team",
       "penetration testing",
       "network pivoting",

@@ -19,6 +19,8 @@ export interface ToolDefinition {
   id: string;
   name: string;
   description: string;
+  image?: string;
+  keywords?: string[];
   category: ToolCategory;
   os: {
     attacker: OSType[];
