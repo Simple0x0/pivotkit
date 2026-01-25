@@ -4,13 +4,12 @@ import { IPInput } from "@/app/components/inputs/IPInput";
 import { PortInput } from "@/app/components/inputs/PortInput";
 import { OSInput } from "@/app/components/inputs/OSInput";
 import { CIDRInput } from "@/app/components/inputs/CIDRInput";
-import { isValidCIDR } from "@/app/lib/validators";
 
 /* ---------------- Validation ---------------- */
 const isPivotValid = (pivot: any) => {
   if (!pivot.attackerPort) return false;
   if (!pivot.network) return false;
-  if (!isValidCIDR(pivot.cidr)) return false;
+  if (!pivot.cidr) return false;
 
   if (pivot.role === "relay") {
     if (!pivot.targetIP) return false;
@@ -101,16 +100,16 @@ export default function LigoloInputs({
               {/* Attacker Section */}
               <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 shadow-lg flex flex-col justify-between">
                 <div>
-                  <h4 className="text-xs font-bold text-zinc-100 mb-2">Attacker</h4>
-                  <div className="flex flex-row flex-wrap gap-3">
+                  <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Attacker</h4>
+                  <div className="flex flex-row flex-wrap gap-3 mt-2">
                     {isEntry && (
                       <IPInput
                         
-                        label="Attacker Listener IP"
-                        value={pivot.attackerBindIP}
-                        onChange={(v) => updatePivot(idx, { attackerBindIP: v })}
-                        info="IP address of the attacker machine for ligolo proxy to listen on, usually 0.0.0.0 to accept connections from any interface."
-                        placeholder="e.g. 0.0.0.0"
+                        label="Attacker IP"
+                        value={pivot.attackerIP}
+                        onChange={(v) => updatePivot(idx, { attackerIP: v })}
+                        info="IP address of the attacker machine reachable by the compromised host."
+                        placeholder="e.g. 192.168.10.5"
                       />
                     )}
 
@@ -127,21 +126,22 @@ export default function LigoloInputs({
                     />
                   </div>
                 </div>
-
-                <OSInput
-                  label="Attacker OS"
-                  value={pivot.attackerOS}
-                  onChange={(v) => updatePivot(idx, { attackerOS: v })}
-                  info="Operating system of the attacker machine (default: linux)."
-                />
+                  {isEntry && (
+                    <OSInput
+                      label="Attacker OS"
+                      value={pivot.attackerOS}
+                      onChange={(v) => updatePivot(idx, { attackerOS: v })}
+                      info="Operating system of the attacker machine (default: linux)."
+                    />
+                  )}
               </div>
 
               {/* Target Section (relay only) */}
               {!isEntry && (
                 <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 shadow-lg flex flex-col justify-between">
                   <div>
-                    <h4 className="text-xs font-bold text-zinc-100 mb-2">Target</h4>
-                    <div className="flex flex-row flex-wrap gap-3">
+                    <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Target</h4>
+                    <div className="flex flex-row flex-wrap gap-3 mt-2">
                       <IPInput
                         
                         label="Compromised Host IP"
@@ -174,8 +174,8 @@ export default function LigoloInputs({
               {/* Routed Network Section */}
               <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 shadow-lg flex flex-col justify-between">
                 <div>
-                  <h4 className="text-xs font-bold text-zinc-100 mb-2">Routed Network</h4>
-                  <div className="flex flex-row flex-wrap gap-3">
+                  <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Routed Network</h4>
+                  <div className="flex flex-row flex-wrap gap-3 mt-2">
                     <IPInput
                       
                       label="Network IP"

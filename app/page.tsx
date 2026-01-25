@@ -15,6 +15,5 @@
 import { redirect } from "next/navigation";
 
 export default function Home() {
-  // redirect("/tools/ligolo-ng");
-  return <></>
+  redirect("/tools/ligolo-ng");
 }

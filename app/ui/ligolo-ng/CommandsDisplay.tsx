@@ -16,10 +16,9 @@ export default function LigoloCommands({
   if (!pivots.length) return null;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       {pivots.map((pivot, idx) => {
         const isEntry = pivot.role === "entry";
-
         const cmds = resolvedCommands[idx] ?? { attacker: [], target: [] };
 
         return (
@@ -27,17 +26,17 @@ export default function LigoloCommands({
             {/* -------- Pivot Header -------- */}
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-zinc-700" />
-              <span className="text-xs text-zinc-400 uppercase tracking-wide font-medium">
+              <span className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">
                 {isEntry ? "Entry Pivot (TUN)" : `Relay Pivot #${idx}`}
               </span>
               <div className="h-px flex-1 bg-zinc-700" />
             </div>
 
             {/* -------- Pivot Card -------- */}
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-lg p-4 hover:shadow-xl transition-shadow duration-200">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-lg p-5">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <CommandPanel title="Attacker Commands" steps={cmds.attacker} />
-                <CommandPanel title="Target Commands" steps={cmds.target} />
+                <CommandPanel title="Attacker" steps={cmds.attacker} />
+                <CommandPanel title="Target" steps={cmds.target} />
               </div>
             </div>
           </div>
@@ -57,16 +56,24 @@ function CommandPanel({
   steps: CommandStep[];
 }) {
   return (
-    <div className="rounded-lg border border-zinc-800 bg-gray-950 shadow-inner p-3 space-y-3">
-      <h4 className="text-xs font-bold text-zinc-100 tracking-wide">{title}</h4>
+    <div className="rounded-lg border border-zinc-800 bg-gray-950 bg-black/40 p-4 space-y-3">
+      <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">
+        On {title}
+      </h4>
 
       {steps.length === 0 && (
-        <p className="text-xs text-zinc-500 italic">No commands generated</p>
+        <p className="text-xs text-zinc-500 italic">
+          No commands generated
+        </p>
       )}
 
       <div className="space-y-2">
         {steps.map((s) => (
-          <CommandRow key={`${title}-${s.step}`} step={s.step} cmd={s.command} />
+          <CommandRow
+            key={`${title}-${s.step}`}
+            step={s.step}
+            cmd={s.command}
+          />
         ))}
       </div>
     </div>
@@ -81,30 +88,47 @@ function CommandRow({ step, cmd }: { step: number; cmd: string }) {
   const copy = () => {
     navigator.clipboard.writeText(cmd);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1000);
+    setTimeout(() => setCopied(false), 900);
   };
 
   return (
-    <div className="flex items-start justify-between gap-3 border border-zinc-700 rounded-md p-3 bg-zinc-900 hover:bg-zinc-800 transition-colors duration-150">
-      <div className="flex items-start gap-3">
-        <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold select-none">
-          {step}
-        </span>
+    <div
+      onClick={copy}
+      className={`
+        group cursor-pointer
+        flex items-start gap-3
+        border border-zinc-800 rounded-md
+        px-3 py-2
+        bg-slate-950
+        hover:bg-gray-900
+        transition-colors
+        shadow-xl
+        transition-all duration-150
+      `}
+      title="Click to copy"
+    >
+      {/* Step */}
+      <span className="flex-shrink-0 mt-0.5 w-6 h-6 flex items-center justify-center rounded bg-gray-800 text-white text-[11px] select-none">
+        {step}
+      </span>
 
-        <code className="text-xs font-mono text-zinc-100 break-all leading-relaxed">
+      {/* Command */}
+      <div className="flex-1">
+        <code className="block text-sm font-bold font-mono text-zinc-100 break-all leading-relaxed">
           {cmd}
         </code>
-      </div>
 
-      <button
-        onClick={copy}
-        className={`text-xs px-2 py-1 rounded hover:bg-zinc-700 transition-colors ${
-          copied ? "text-green-400" : "text-zinc-400 hover:text-zinc-200"
-        }`}
-        title="Copy command"
-      >
-        {copied ? "✓ Copied" : "⧉"}
-      </button>
+        {/* Copy feedback */}
+        <span
+          className={`mt-1 block text-[10px] transition-opacity ${
+            copied
+              ? "text-green-400 opacity-100"
+              : "opacity-0 group-hover:opacity-40 text-zinc-400"
+          }`}
+        >
+          {copied ? "Copied" : "Click anywhere to copy"}
+        </span>
+      </div>
     </div>
   );
 }

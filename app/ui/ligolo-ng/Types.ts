@@ -7,6 +7,5 @@ export type CommandStep = {
 
 export type PivotCommands = {
   attacker: CommandStep[];
-  proxy: CommandStep[];
   target: CommandStep[];
 };

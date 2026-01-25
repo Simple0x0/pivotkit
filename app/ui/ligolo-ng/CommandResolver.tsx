@@ -1,23 +1,24 @@
-// ligolo-ng/CommandResolver.ts
+// app/ui/ligolo-ng/CommandResolver.ts
+
 import { LigoloPivot } from "@/app/hooks/usePivotChain";
 import { PivotCommands } from "./Types";
 
-/* ---------------- Command Templates ---------------- */
+/* ---------------- Templates ---------------- */
 
-const commandTemplates: Record<string, string> = {
-  tun: "ip tuntap add user $(whoami) mode tun {{tun_name}}",
-  route: "ip route add {{network}}/{{cidr}} dev {{tun_name}}",
-  proxy: "./ligolo-proxy -selfcert -laddr {{attackerBindIP}}:{{attackerPort}}",
-  agent: "./ligolo-agent -connect {{targetIP}}:{{targetPort}} -ignore-cert",
+const commandTemplates = {
+  tun: "sudo ip tuntap add user $(whoami) mode tun {{tun}}",
+  route: "sudo ip route add {{network}}/{{cidr}} dev {{tun}}",
+  proxy: "./ligolo-proxy -selfcert -laddr {{bindIP}}:{{port}}",
+  agent: "./ligolo-agent -connect {{connectIP}}:{{port}} -ignore-cert",
   session: "ligolo-ng session",
-  startTun: "start --tun {{tun_name}}",
+  startTun: "start --tun {{tun}}",
   listener:
-    "listener_add --addr 0.0.0.0:{{listener_port}} --to 127.0.0.1:{{prev_port}} --tcp",
+    "listener_add --addr 0.0.0.0:{{port}} --to 127.0.0.1:{{prevPort}} --tcp",
 };
 
-/* ---------------- Execution Sequences ---------------- */
+/* ---------------- Sequences ---------------- */
 
-const BASE_SEQUENCE = [
+const ENTRY_SEQUENCE = [
   "tun",
   "route",
   "proxy",
@@ -26,30 +27,23 @@ const BASE_SEQUENCE = [
   "startTun",
 ] as const;
 
-const sequences: Record<"entry" | "relay", readonly string[]> = {
-  entry: BASE_SEQUENCE,
-  relay: ["listener", ...BASE_SEQUENCE],
-};
+const RELAY_SEQUENCE = [
+  "listener",
+  "tun",
+  "route",
+  "agent",
+  "session",
+  "startTun",
+] as const;
 
 /* ---------------- Helpers ---------------- */
 
 function render(template: string, ctx: Record<string, string | number>) {
-  return template.replace(/{{(\w+)}}/g, (_, k) =>
-    ctx[k] !== undefined ? String(ctx[k]) : ""
-  );
+  return template.replace(/{{(\w+)}}/g, (_, k) => String(ctx[k] ?? ""));
 }
 
-function commandPlane(cmd: string): "attacker" | "proxy" | "target" {
-  switch (cmd) {
-    case "agent":
-      return "target";
-    case "listener":
-    case "session":
-    case "startTun":
-      return "proxy";
-    default:
-      return "attacker";
-  }
+function plane(cmd: string): "attacker" | "target" {
+  return cmd === "agent" ? "target" : "attacker";
 }
 
 /* ---------------- Resolver ---------------- */
@@ -57,40 +51,52 @@ function commandPlane(cmd: string): "attacker" | "proxy" | "target" {
 export function resolvePivotCommands(
   pivots: LigoloPivot[]
 ): PivotCommands[] {
-  let globalStep = 1;
+  let step = 1;
 
   return pivots.map((pivot, idx) => {
-    const tun_name = `ligolo${idx + 1}`;
+    const tun = `ligolo${idx + 1}`;
     const prev = idx > 0 ? pivots[idx - 1] : undefined;
 
-    const ctx: Record<string, string | number> = {
-      tun_name,
+    /* -------- CRITICAL LOGIC -------- */
+
+    let connectIP: string;
+
+    if (pivot.role === "entry") {
+      connectIP = pivot.attackerIP?.trim()
+        ? pivot.attackerIP
+        : "<ATTACKER_IP>";
+    } else {
+      connectIP = pivot.targetIP?.trim()
+        ? pivot.targetIP
+        : "<PREVIOUS_TARGET_IP>";
+    }
+
+    /* -------- Context -------- */
+
+    const ctx = {
+      tun,
       network: pivot.network,
       cidr: pivot.cidr,
-      attackerBindIP: pivot.attackerBindIP,
-      attackerPort: pivot.attackerPort,
-      targetIP: pivot.targetIP ?? pivot.attackerBindIP,
-      targetPort: pivot.targetPort ?? pivot.attackerPort,
-      listener_port: pivot.attackerPort,
-      prev_port: prev?.attackerPort ?? "",
+
+      bindIP: pivot.attackerBindIP,
+      port: pivot.attackerPort,
+
+      connectIP,
+
+      prevPort: prev?.attackerPort ?? "",
     };
 
-    const result: PivotCommands = {
-      attacker: [],
-      proxy: [],
-      target: [],
-    };
+    const cmds: PivotCommands = { attacker: [], target: [] };
+    const sequence =
+      pivot.role === "entry" ? ENTRY_SEQUENCE : RELAY_SEQUENCE;
 
-    for (const cmdKey of sequences[pivot.role]) {
-      const plane = commandPlane(cmdKey);
-      const rendered = render(commandTemplates[cmdKey], ctx);
-
-      result[plane].push({
-        step: globalStep++,
-        command: rendered,
+    for (const key of sequence) {
+      cmds[plane(key)].push({
+        step: step++,
+        command: render(commandTemplates[key], ctx),
       });
     }
 
-    return result;
+    return cmds;
   });
 }

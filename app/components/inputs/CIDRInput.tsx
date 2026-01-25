@@ -28,7 +28,7 @@ export function CIDRInput({
 
   return (
     <div className={`flex flex-col mb-4 w-full sm:w-auto ${className}`}>
-      <label className="text-xs font-medium text-zinc-400">{label}</label>
+      <label className="mb-1 text-xs font-medium text-zinc-400">{label}</label>
 
       <div className="flex items-center gap-2">
         <div className="flex items-center border border-zinc-700 rounded-lg bg-zinc-900 overflow-hidden">

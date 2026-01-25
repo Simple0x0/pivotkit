@@ -11,10 +11,21 @@ export type LigoloPivot = {
   attackerPort: number;
   attackerOS: OS;
 
-  // Bind IP (defaulted by role, user-overridable)
+  /**
+   * Real attacker IP
+   * - REQUIRED for entry pivot
+   * - UNUSED for relay pivots (derived dynamically)
+   */
+  attackerIP: string;
+
+  /**
+   * Bind IP for ligolo-proxy
+   * entry  → 0.0.0.0
+   * relay  → 127.0.0.1
+   */
   attackerBindIP: string;
 
-  // Relay target (derived automatically)
+  // Relay target (user-controlled)
   targetIP?: string;
   targetPort?: number;
   targetOS?: OS;
@@ -24,14 +35,17 @@ export type LigoloPivot = {
   cidr: number;
 };
 
-/* ---------- LigoloPivot factories ---------- */
+/* ---------- Factories ---------- */
 
 function createEntryPivot(): LigoloPivot {
   return {
     role: "entry",
+
+    attackerIP: "",
     attackerPort: 11601,
     attackerOS: "linux",
-    attackerBindIP: "0.0.0.0", // default for entry (TUN-facing)
+    attackerBindIP: "0.0.0.0",
+
     network: "",
     cidr: 24,
   };
@@ -41,10 +55,14 @@ function createRelayPivot(previous: LigoloPivot): LigoloPivot {
   return {
     role: "relay",
 
+    // attackerIP is meaningless on relays
+    attackerIP: "",
+
     attackerPort: previous.attackerPort + 1,
     attackerOS: "linux",
-    attackerBindIP: "127.0.0.1", // default for relay (local-only)
+    attackerBindIP: "127.0.0.1",
 
+    // User must enter this
     targetIP: "",
     targetPort: previous.attackerPort,
     targetOS: previous.attackerOS,
@@ -57,7 +75,9 @@ function createRelayPivot(previous: LigoloPivot): LigoloPivot {
 /* ---------- Hook ---------- */
 
 export function usePivotChain() {
-  const [pivots, setPivots] = useState<LigoloPivot[]>([createEntryPivot()]);
+  const [pivots, setPivots] = useState<LigoloPivot[]>([
+    createEntryPivot(),
+  ]);
 
   function updatePivot(index: number, patch: Partial<LigoloPivot>) {
     setPivots(prev =>
@@ -78,7 +98,7 @@ export function usePivotChain() {
     setPivots(prev => {
       const filtered = prev.filter((_, i) => i !== index);
 
-      // Re-derive relay targets after removal
+      // Re-derive relay linkage
       return filtered.map((pivot, i) => {
         if (i === 0) return pivot;
         if (pivot.role !== "relay") return pivot;
@@ -87,7 +107,6 @@ export function usePivotChain() {
 
         return {
           ...pivot,
-          targetIP: previous.attackerBindIP,
           targetPort: previous.attackerPort,
           targetOS: previous.attackerOS,
         };
@@ -103,7 +122,7 @@ export function usePivotChain() {
   };
 }
 
-/* ---------- Helper: getBindIP (for command generation) ---------- */
+/* ---------- Helper ---------- */
 
 export function getBindIP(pivot: LigoloPivot): string {
   return pivot.attackerBindIP;

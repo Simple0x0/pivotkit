@@ -1,5 +1,5 @@
 id: ligolo-ng
-name: Ligolo-NG Multi-Pivot
+name: Ligolo-NG
 description: >
   TUN-based pivoting tool using a lightweight agent and proxy model.
   Supports chained (multi-hop) pivoting with explicit execution order
@@ -89,25 +89,3 @@ notes:
   - One TUN interface is required per pivot depth.
   - Each new pivot repeats the same execution order with new parameters.
   - Listener must be created before connecting the next agent.
-
-
-# Input Requirement for each pivot level
-# Entry Pivot (TUN)
-# - attackerPort = yes and default 11601 
-# - attackerOS = yes and default Linux 
-# - attackerBindIP = yes and default 0.0.0.0 
-# - network = yes and no default value
-# - cidr = yes and default 24
-# - targetPort = No
-# - targetIP = No
-# - targetOS = yes
-
-# Relay Pivots
-# - attackerPort = yes and default attackerPort + 1 
-# - attackerOS = No - already known in entry
-# - attackerBindIP = No not required ( 127.0.0.1 default in the command)
-# - network = yes and no default value
-# - cidr = yes and default 24
-# - targetPort = yes and no default value
-# - targetIP = yes 
-# - targetOS = yes
