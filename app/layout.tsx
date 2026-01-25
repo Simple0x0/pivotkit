@@ -54,7 +54,7 @@ export default function RootLayout({
               Want to contribute?{" "}
               <a
                 href="https://discordapp.com/users/917464985922338846"
-                className="text-zinc-300 hover:underline"
+                className="text-blue-500 hover:underline font-bold"
               >
                 Get in touch
               </a>

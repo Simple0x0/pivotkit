@@ -121,9 +121,3 @@ export function usePivotChain() {
     removePivot,
   };
 }
-
-/* ---------- Helper ---------- */
-
-export function getBindIP(pivot: LigoloPivot): string {
-  return pivot.attackerBindIP;
-}

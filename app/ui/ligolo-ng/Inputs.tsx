@@ -65,145 +65,148 @@ export default function LigoloInputs({
         </span>
       </div>
 
-      {/* Pivot Cards */}
-      {pivots.map((pivot, idx) => {
-        const isLast = idx === pivots.length - 1;
-        const isEntry = pivot.role === "entry";
+      {/* Pivot Cards - Scrollable Container */}
+      <div className="scrollable max-h-[70vh] overflow-y-auto pr-2 space-y-6">
+        {pivots.map((pivot, idx) => {
+          const isLast = idx === pivots.length - 1;
+          const isEntry = pivot.role === "entry";
 
-        return (
-          <div
-            key={idx}
-            className="relative border border-zinc-800 rounded-lg p-4 bg-zinc-900 shadow-xl"
-          >
-            {/* Header */}
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-sm font-semibold">
-                {isEntry ? "Entry Pivot (TUN)" : `Relay Pivot #${idx}`}
-              </h3>
-
-              {!isEntry && isLast && pivots.length > 1 && (
-                <button
-                  onClick={() => removePivot(idx)}
-                  className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition"
-                >
-                  ✕ Remove Relay
-                </button>
-              )}
-            </div>
-
-            {/* Body */}
+          return (
             <div
-              className={`grid grid-cols-1 sm:grid-cols-2 ${
-                isEntry ? "lg:grid-cols-2" : "lg:grid-cols-3"
-              } gap-6`}
+              key={idx}
+              className="relative border border-zinc-800 rounded-lg p-4 bg-zinc-900 shadow-xl"
             >
-              {/* Attacker Section */}
-              <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 shadow-lg flex flex-col justify-between">
-                <div>
-                  <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Attacker</h4>
-                  <div className="flex flex-row flex-wrap gap-3 mt-2">
-                    {isEntry && (
-                      <IPInput
-                        
-                        label="Attacker IP"
-                        value={pivot.attackerIP}
-                        onChange={(v) => updatePivot(idx, { attackerIP: v })}
-                        info="IP address of the attacker machine reachable by the compromised host."
-                        placeholder="e.g. 192.168.10.5"
-                      />
-                    )}
+              {/* Header */}
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-semibold">
+                  {isEntry ? "Entry Pivot (TUN)" : `Relay Pivot #${idx}`}
+                </h3>
 
-                    <PortInput
-                      
-                      label="Listener Port"
-                      value={pivot.attackerPort}
-                      onChange={(v) => updatePivot(idx, { attackerPort: v })}
-                      info={
-                        isEntry
-                          ? "A port for ligolo proxy to listen on (default: 11601)."
-                          : "Attacker local port which ligolo agent forwards traffic to."
-                      }
-                    />
-                  </div>
-                </div>
-                  {isEntry && (
-                    <OSInput
-                      label="Attacker OS"
-                      value={pivot.attackerOS}
-                      onChange={(v) => updatePivot(idx, { attackerOS: v })}
-                      info="Operating system of the attacker machine (default: linux)."
-                    />
-                  )}
+                {!isEntry && isLast && pivots.length > 1 && (
+                  <button
+                    onClick={() => removePivot(idx)}
+                    className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition"
+                  >
+                    ✕ Remove Relay
+                  </button>
+                )}
               </div>
 
-              {/* Target Section (relay only) */}
-              {!isEntry && (
+              {/* Body */}
+              <div
+                className={`grid grid-cols-1 sm:grid-cols-2 ${
+                  isEntry ? "lg:grid-cols-2" : "lg:grid-cols-3"
+                } gap-6`}
+              >
+                {/* Attacker Section */}
                 <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 shadow-lg flex flex-col justify-between">
                   <div>
-                    <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Target</h4>
+                    <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">
+                      Attacker
+                    </h4>
                     <div className="flex flex-row flex-wrap gap-3 mt-2">
-                      <IPInput
-                        
-                        label="Compromised Host IP"
-                        value={pivot.targetIP}
-                        onChange={(v) => updatePivot(idx, { targetIP: v })}
-                        info={`IP address of the previously compromised host (Relay ${idx}) providing access to the new network.`}
-                        placeholder="e.g. 10.10.30.1"
-                      />
+                      {isEntry && (
+                        <IPInput
+                          label="Attacker IP"
+                          value={pivot.attackerIP}
+                          onChange={(v) => updatePivot(idx, { attackerIP: v })}
+                          info="IP address of the attacker machine reachable by the compromised host."
+                          placeholder="e.g. 192.168.10.5"
+                        />
+                      )}
 
                       <PortInput
-                        
-                        label="Target Port"
-                        value={pivot.targetPort}
-                        onChange={(v) => updatePivot(idx, { targetPort: v })}
-                        info="Port exposed on the previously compromised host to relay traffic."
+                        label="Listener Port"
+                        value={pivot.attackerPort}
+                        onChange={(v) => updatePivot(idx, { attackerPort: v })}
+                        info={
+                          isEntry
+                            ? "A port for ligolo proxy to listen on (default: 11601)."
+                            : "Attacker local port which ligolo agent forwards traffic to."
+                        }
                       />
                     </div>
                   </div>
-                  <div className="mt-4">
+                  {isEntry && (
                     <OSInput
                       label="Target OS"
                       value={pivot.targetOS}
                       onChange={(v) => updatePivot(idx, { targetOS: v })}
-                      info="Operating system of the previously compromised host."
+                      info="Operating system of the target machine (default: linux)."
                     />
+                  )}
+                </div>
+
+                {/* Target Section (relay only) */}
+                {!isEntry && (
+                  <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 shadow-lg flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">
+                        Target
+                      </h4>
+                      <div className="flex flex-row flex-wrap gap-3 mt-2">
+                        <IPInput
+                          label="Compromised Host IP"
+                          value={pivot.targetIP}
+                          onChange={(v) => updatePivot(idx, { targetIP: v })}
+                          info={`IP address of the previously compromised host (Relay ${idx}) providing access to the new network.`}
+                          placeholder="e.g. 10.10.30.1"
+                        />
+
+                        <PortInput
+                          label="Target Port"
+                          value={pivot.targetPort}
+                          onChange={(v) => updatePivot(idx, { targetPort: v })}
+                          info="Port exposed on the previously compromised host to relay traffic."
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <OSInput
+                        label="Target OS"
+                        value={pivot.targetOS}
+                        onChange={(v) => updatePivot(idx, { targetOS: v })}
+                        info="Operating system of the previously compromised host."
+                      />
+                    </div>
                   </div>
+                )}
+
+                {/* Routed Network Section */}
+                <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 shadow-lg flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">
+                      Routed Network
+                    </h4>
+                    <div className="flex flex-row flex-wrap gap-3 mt-2">
+                      <IPInput
+                        label="Network IP"
+                        value={pivot.network}
+                        onChange={(v) => updatePivot(idx, { network: v })}
+                        info="The new network that will be routed through this pivot."
+                        placeholder="e.g. 10.10.30.0"
+                      />
+
+                      <CIDRInput
+                        label="Network CIDR"
+                        value={pivot.cidr}
+                        onChange={(v) => updatePivot(idx, { cidr: v })}
+                        info="CIDR notation for the new network to be routed (e.g. 24)."
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {!isLast && (
+                <div className="absolute top-4 right-4 text-[10px] text-zinc-500">
+                  Locked
                 </div>
               )}
-
-              {/* Routed Network Section */}
-              <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 shadow-lg flex flex-col justify-between">
-                <div>
-                  <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">Routed Network</h4>
-                  <div className="flex flex-row flex-wrap gap-3 mt-2">
-                    <IPInput
-                      
-                      label="Network IP"
-                      value={pivot.network}
-                      onChange={(v) => updatePivot(idx, { network: v })}
-                      info="The new network that will be routed through this pivot."
-                      placeholder="e.g. 10.10.30.0"
-                    />
-
-                    <CIDRInput
-                      
-                      value={pivot.cidr}
-                      onChange={(v) => updatePivot(idx, { cidr: v })}
-                      info="CIDR notation for the new network to be routed (e.g. 24)."
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
-
-            {!isLast && (
-              <div className="absolute top-4 right-4 text-[10px] text-zinc-500">
-                Locked
-              </div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
 
       {/* Add Relay */}
       <div className="flex justify-center pt-2">

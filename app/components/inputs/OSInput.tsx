@@ -4,21 +4,21 @@ import InfoTooltip from "@/app/components/InfoTooltip";
 
 export function OSInput({
   label,
-  value = "Linux",
+  value = "linux",
   onChange,
   info,
   className = "",
 }: {
   label: string;
-  value: "Linux" | "Win";
-  onChange: (v: "Linux" | "Win") => void;
+  value: "linux" | "windows";
+  onChange: (v: "linux" | "windows") => void;
   info?: string;
   className?: string;
 }) {
-  const isLinux = value === "Linux";
+  const isLinux = value === "linux";
 
   const toggle = () => {
-    onChange(isLinux ? "Win" : "Linux");
+    onChange(isLinux ? "windows" : "linux");
   };
 
   return (

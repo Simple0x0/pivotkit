@@ -8,12 +8,11 @@ import { PivotCommands } from "./Types";
 const commandTemplates = {
   tun: "sudo ip tuntap add user $(whoami) mode tun {{tun}}",
   route: "sudo ip route add {{network}}/{{cidr}} dev {{tun}}",
-  proxy: "./ligolo-proxy -selfcert -laddr {{bindIP}}:{{port}}",
-  agent: "./ligolo-agent -connect {{connectIP}}:{{port}} -ignore-cert",
-  session: "ligolo-ng session",
+  proxy: "./proxy -selfcert -laddr {{bindIP}}:{{port}}",
+  agent: "{{agentBin}} -connect {{connectIP}}:{{port}} -ignore-cert",
+  session: "session",
   startTun: "start --tun {{tun}}",
-  listener:
-    "listener_add --addr 0.0.0.0:{{port}} --to 127.0.0.1:{{prevPort}} --tcp",
+  listener: "listener_add --addr 0.0.0.0:{{port}} --to 127.0.0.1:{{prevPort}} --tcp",
 };
 
 /* ---------------- Sequences ---------------- */
@@ -57,7 +56,6 @@ export function resolvePivotCommands(
     const tun = `ligolo${idx + 1}`;
     const prev = idx > 0 ? pivots[idx - 1] : undefined;
 
-    /* -------- CRITICAL LOGIC -------- */
 
     let connectIP: string;
 
@@ -71,19 +69,19 @@ export function resolvePivotCommands(
         : "<PREVIOUS_TARGET_IP>";
     }
 
+    const agentBin =  pivot.targetOS === "windows" ? "./agent.exe" : "./agent";
+
     /* -------- Context -------- */
 
     const ctx = {
       tun,
       network: pivot.network,
       cidr: pivot.cidr,
-
       bindIP: pivot.attackerBindIP,
       port: pivot.attackerPort,
-
       connectIP,
-
       prevPort: prev?.attackerPort ?? "",
+      agentBin,
     };
 
     const cmds: PivotCommands = { attacker: [], target: [] };

@@ -16,7 +16,15 @@ export default function LigoloCommands({
   if (!pivots.length) return null;
 
   return (
-    <div className="space-y-12">
+    <div
+      className="
+        max-h-[70vh]
+        overflow-y-auto
+        pr-2
+        space-y-12
+        scrollable
+      "
+    >
       {pivots.map((pivot, idx) => {
         const isEntry = pivot.role === "entry";
         const cmds = resolvedCommands[idx] ?? { attacker: [], target: [] };
@@ -33,10 +41,14 @@ export default function LigoloCommands({
             </div>
 
             {/* -------- Pivot Card -------- */}
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900 shadow-lg p-5">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="rounded-xl border border-zinc-800 bg-gray-950 bg-black/40 shadow-lg p-5">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative">
                 <CommandPanel title="Attacker" steps={cmds.attacker} />
-                <CommandPanel title="Target" steps={cmds.target} />
+
+                <div className="relative">
+                  <div className="hidden lg:block absolute top-1/2 left-0 h-3/5 w-px -ml-3 mt-3 -translate-y-1/2 bg-slate-700" />
+                  <CommandPanel title="Target" steps={cmds.target} />
+                </div>
               </div>
             </div>
           </div>
@@ -45,6 +57,7 @@ export default function LigoloCommands({
     </div>
   );
 }
+
 
 /* ---------------- Command Panel ---------------- */
 
@@ -56,7 +69,7 @@ function CommandPanel({
   steps: CommandStep[];
 }) {
   return (
-    <div className="rounded-lg border border-zinc-800 bg-gray-950 bg-black/40 p-4 space-y-3">
+    <div className="rounded-lg  p-4 space-y-3">
       <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">
         On {title}
       </h4>
@@ -92,43 +105,42 @@ function CommandRow({ step, cmd }: { step: number; cmd: string }) {
   };
 
   return (
-    <div
-      onClick={copy}
-      className={`
-        group cursor-pointer
-        flex items-start gap-3
-        border border-zinc-800 rounded-md
-        px-3 py-2
-        bg-slate-950
-        hover:bg-gray-900
-        transition-colors
-        shadow-xl
-        transition-all duration-150
-      `}
-      title="Click to copy"
-    >
-      {/* Step */}
-      <span className="flex-shrink-0 mt-0.5 w-6 h-6 flex items-center justify-center rounded bg-gray-800 text-white text-[11px] select-none">
-        {step}
-      </span>
+  <div
+    onClick={copy}
+    className={`
+      group cursor-pointer
+      flex items-start gap-3
+      border border-slate-800 rounded-md
+      px-3 py-2
+      hover:bg-slate-950
+      shadow-xl
+      transition-all duration-150
+    `}
+    title="Click to copy"
+  >
+    {/* Step */}
+    <span className="flex-shrink-0 mt-0.5 w-6 h-6 flex items-center justify-center rounded bg-gray-800 text-white text-[11px] select-none">
+      {step}
+    </span>
 
-      {/* Command */}
-      <div className="flex-1">
-        <code className="block text-sm font-bold font-mono text-zinc-100 break-all leading-relaxed">
-          {cmd}
-        </code>
+    {/* Command + Copy */}
+    <div className="flex flex-1 justify-between items-center">
+      <code className="text-sm font-bold font-sans text-zinc-400 break-all leading-relaxed">
+        {cmd}
+      </code>
 
-        {/* Copy feedback */}
-        <span
+      {/* Copy feedback */}
+      <span
           className={`mt-1 block text-[10px] transition-opacity ${
             copied
               ? "text-green-400 opacity-100"
               : "opacity-0 group-hover:opacity-40 text-zinc-400"
           }`}
         >
-          {copied ? "Copied" : "Click anywhere to copy"}
-        </span>
-      </div>
+        {copied ? "Copied!" : "Copy"}
+      </span>
     </div>
-  );
+  </div>
+);
+
 }
