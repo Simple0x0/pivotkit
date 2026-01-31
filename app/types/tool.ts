@@ -31,3 +31,13 @@ export interface ToolDefinition {
   capabilities: ToolCapability[];
   notes?: string[];
 }
+
+export type CommandStep = {
+  step: number;
+  command: string;
+};
+
+export type PivotCommands = {
+  attacker: CommandStep[];
+  target: CommandStep[];
+};
