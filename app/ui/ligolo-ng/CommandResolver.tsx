@@ -2,11 +2,12 @@
 
 import { LigoloPivot } from "@/app/hooks/usePivotChain";
 import { PivotCommands } from "./Types";
+import { render, plane } from "@/app/lib/helpers";
 
 /* ---------------- Templates ---------------- */
 
 const commandTemplates = {
-  tun: "sudo ip tuntap add user $(whoami) mode tun {{tun}}",
+  tun: "sudo ip tuntap add user $(whoami) mode tun {{tun}} && sudo ip link set {{tun}} up",
   route: "sudo ip route add {{network}}/{{cidr}} dev {{tun}}",
   proxy: "./proxy -selfcert -laddr {{bindIP}}:{{port}}",
   agent: "{{agentBin}} -connect {{connectIP}}:{{port}} -ignore-cert",
@@ -34,16 +35,6 @@ const RELAY_SEQUENCE = [
   "session",
   "startTun",
 ] as const;
-
-/* ---------------- Helpers ---------------- */
-
-function render(template: string, ctx: Record<string, string | number>) {
-  return template.replace(/{{(\w+)}}/g, (_, k) => String(ctx[k] ?? ""));
-}
-
-function plane(cmd: string): "attacker" | "target" {
-  return cmd === "agent" ? "target" : "attacker";
-}
 
 /* ---------------- Resolver ---------------- */
 

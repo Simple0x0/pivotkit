@@ -20,6 +20,7 @@ export interface ToolDefinition {
   name: string;
   description: string;
   image?: string;
+  blog?: string;
   keywords?: string[];
   category: ToolCategory;
   os: {

@@ -2,7 +2,7 @@
 
 import { usePivotChain } from "@/app/hooks/usePivotChain";
 import LigoloInputs from "./Inputs";
-import LigoloCommands from "./CommandsDisplay";
+import LigoloCommandsDisplay from "./LigoloCommandsDisplay";
 import { resolvePivotCommands } from "./CommandResolver"; 
 
 export default function LigoloWorkspace() {
@@ -23,7 +23,7 @@ export default function LigoloWorkspace() {
         removePivot={removePivot}
       />
 
-      <LigoloCommands pivots={pivots} resolvedCommands={resolvedCommands}/>
+      <LigoloCommandsDisplay pivots={pivots} resolvedCommands={resolvedCommands}/>
     </div>
   );
 }

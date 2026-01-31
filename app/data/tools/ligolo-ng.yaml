@@ -5,6 +5,9 @@ description: >
   Supports chained (multi-hop) pivoting with explicit execution order
   for attacker and compromised hosts.
 
+
+blog: https://teamsimple.net/blogs/ligolong-modern-network-pivoting
+
 image: /public/ligolo-ng.png
 
 category: tun

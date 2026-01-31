@@ -72,9 +72,7 @@ export default async function ToolPage({ params }: Props) {
 
   return (
     <>
-      <h1 className="text-2xl font-semibold mb-2">{toolData.name}</h1>
-      <p className="text-zinc-400 mb-6">{toolData.description}</p>
-
+      <p className="text-zinc-400 text-center text-xs">{toolData.description} <a href={toolData.blog} target="_blank" className="text-blue-500 ">Learn about this tool</a>.</p>
       <ToolWorkspace />
     </>
   );
