@@ -38,6 +38,7 @@ export default function RootLayout({
             <main className="flex-1 p-6">
               <header className="text-center mb-6">
                 <h1 className="text-4xl font-semibold">Pivoting ToolKits</h1>
+                <p className="text-zinc-400 mt-2 text-[10px]">Attacker / Pentester Perspective</p>
               </header>
 
               <section className="mx-auto w-full lg:w-4/5 flex flex-col gap-6">

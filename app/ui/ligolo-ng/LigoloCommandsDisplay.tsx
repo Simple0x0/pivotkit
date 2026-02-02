@@ -1,7 +1,7 @@
 "use client";
 
-import { LigoloPivot } from "@/app/hooks/usePivotChain";
-import { PivotCommands, CommandStep } from "@/app/types/tool";
+import { LigoloPivot } from "@/app/hooks/useLigoloPivotChain";
+import { PivotCommands } from "@/app/types/tool";
 import CommandPanel from "@/app/components/CommandPanel";
 
 /* ---------------- Main Component ---------------- */

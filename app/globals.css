@@ -35,13 +35,13 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #2a395d; /* slate-900 */
+  background-color: #1e293b; /* slate-900 */
   border-radius: 9999px;     /* Rounded thumb */
   border: 2px solid transparent; /* Optional: padding around thumb */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #1e293b; /* Slightly lighter on hover */
+  background-color: #2a395d; /* Slightly lighter on hover */
 }
 
 .scrollable {

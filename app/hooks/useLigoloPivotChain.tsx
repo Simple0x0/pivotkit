@@ -74,7 +74,7 @@ function createRelayPivot(previous: LigoloPivot): LigoloPivot {
 
 /* ---------- Hook ---------- */
 
-export function usePivotChain() {
+export function useLigoloPivotChain() {
   const [pivots, setPivots] = useState<LigoloPivot[]>([
     createEntryPivot(),
   ]);

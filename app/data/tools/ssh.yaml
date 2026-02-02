@@ -1,0 +1,106 @@
+id: ssh
+name: SSH
+description: >
+  SSH-based pivoting using dynamic SOCKS proxies and local port forwarding.
+  Supports controlled access to internal services and limited multi-hop
+  pivoting without requiring root privileges.
+
+blog: https://teamsimple.net/blogs/ssh-pivoting-practical-guide
+
+image: /public/ssh.png
+
+category: socks
+
+os:
+  attacker:
+    - linux
+    - macos
+  target:
+    - linux
+
+requires_root: false
+
+modes:
+  - remote
+  - local
+  - dynamic
+
+inputs:
+  target_ip:
+    label: Target Host IP
+    type: ip
+    required: true
+
+  target_user:
+    label: SSH Username
+    type: string
+    required: true
+
+  ssh_port:
+    label: SSH Port
+    type: port
+    default: 22
+
+  bind_ip:
+    label: Bind IP
+    type: ip
+    default: 127.0.0.1
+
+  bind_port:
+    label: Bind Port
+    type: port
+    required: true
+
+  forward_host:
+    label: Forward Host
+    type: ip
+    required: false
+
+  forward_port:
+    label: Forward Port
+    type: port
+    required: false
+
+execution:
+  remote:
+    - step: 1
+      host: attacker
+      command: >
+        ssh -R {{bind_ip}}:{{bind_port}}:{{forward_host}}:{{forward_port}} {{target_user}}@{{target_ip}} -p {{ssh_port}}
+
+  local:
+    - step: 1
+      host: attacker
+      command: >
+        ssh -L {{bind_port}}:{{forward_host}}:{{forward_port}} {{target_user}}@{{target_ip}} -p {{ssh_port}}
+
+  dynamic:
+    - step: 1
+      host: attacker
+      command: >
+        ssh -D {{bind_port}} {{target_user}}@{{target_ip}} -p {{ssh_port}}
+
+notes:
+  - "-R (Remote): Victim exposes a port that forwards back through the attacker."
+  - "-L (Local): Attacker exposes a local port that forwards into the victim or its internal network."
+  - "-D (Dynamic): Attacker creates a SOCKS proxy and pivots through the victim."
+  - "Remote forwarding requires GatewayPorts enabled on the target SSH server for non-local binds."
+  - "SSH does not modify routing tables or create interfaces."
+  - "Each mode is independent and typically run in a dedicated SSH session."
+
+mental_model:
+  - "-R → Victim connects back to attacker"
+  - "-L → Attacker connects into victim"
+  - "-D → Attacker pivots through victim"
+
+keywords:
+  - ssh
+  - port forwarding
+  - remote forwarding
+  - local forwarding
+  - dynamic forwarding
+  - socks proxy
+  - network pivoting
+  - lateral movement
+  - post-exploitation
+  - offensive security

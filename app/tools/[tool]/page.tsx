@@ -1,6 +1,7 @@
 import { loadTools, loadToolById } from "@/app/lib/toolLoader";
 import { notFound } from "next/navigation";
 import LigoloWorkspace from "@/app/ui/ligolo-ng/Workspace";
+import SSHWorkspace from "@/app/ui/ssh/Workspace";
 import type { Metadata } from "next";
 import React from "react";
 
@@ -52,6 +53,7 @@ export async function generateMetadata(
 
 const WORKSPACE_MAP: Record<string, React.FC> = {
   "ligolo-ng": LigoloWorkspace,
+  "ssh": SSHWorkspace,
   // future tools here
 };
 

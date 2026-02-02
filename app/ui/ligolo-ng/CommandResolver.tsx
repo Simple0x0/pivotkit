@@ -1,6 +1,6 @@
 // app/ui/ligolo-ng/CommandResolver.ts
 
-import { LigoloPivot } from "@/app/hooks/usePivotChain";
+import { LigoloPivot } from "@/app/hooks/useLigoloPivotChain";
 import { PivotCommands } from "@/app/types/tool";
 import { render, plane } from "@/app/lib/helpers";
 

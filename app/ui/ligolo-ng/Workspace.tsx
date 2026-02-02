@@ -1,6 +1,6 @@
 "use client";
 
-import { usePivotChain } from "@/app/hooks/usePivotChain";
+import { useLigoloPivotChain } from "@/app/hooks/useLigoloPivotChain";
 import LigoloInputs from "./Inputs";
 import LigoloCommandsDisplay from "./LigoloCommandsDisplay";
 import { resolvePivotCommands } from "./CommandResolver"; 
@@ -11,7 +11,7 @@ export default function LigoloWorkspace() {
     updatePivot,
     addPivot,
     removePivot,
-  } = usePivotChain();
+  } = useLigoloPivotChain();
 
   const resolvedCommands = resolvePivotCommands(pivots);
   return (
