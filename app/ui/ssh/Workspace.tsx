@@ -15,7 +15,7 @@ export default function SSHWorkspace() {
     removeForward,
   } = useSSHPivot();
 
-//   const resolvedCommands = resolvePivotCommands(pivots);
+  const resolvedCommands = resolvePivotCommands(pivot);
   return (
     <div className="space-y-10">
       <SSHInputs
@@ -27,7 +27,7 @@ export default function SSHWorkspace() {
         removeForward={removeForward}
       />
 
-      {/* <SSHCommandsDisplay pivots={pivots} resolvedCommands={resolvedCommands}/> */}
+  <SSHCommandsDisplay pivot={pivot} resolvedCommands={resolvedCommands} />
     </div>
   );
 }

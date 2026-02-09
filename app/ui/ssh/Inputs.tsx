@@ -77,7 +77,7 @@ export default function SSHInputs({
                   label="SSH User"
                   value={pivot.targetUser}
                   onChange={v => updatePivot({ targetUser: v })}
-                  placeholder="targetuser"
+                  placeholder="Targetuser"
                   info="Username used to authenticate on the target SSH server."
                 />
 
@@ -132,16 +132,19 @@ export default function SSHInputs({
                       <IPInput
                         label="Forward Host"
                         value={f.forwardHost}
-                        onChange={v =>
-                          updateForward(i, { forwardHost: v })
+                        onChange={v => updateForward(i, { forwardHost: v })}
+                        placeholder={
+                            pivot.mode === "local"
+                            ? "127.0.0.1"
+                            : "172.16.5.80"
                         }
-                        placeholder="127.0.0.1"
                         info={
-                          pivot.mode === "local"
+                            pivot.mode === "local"
                             ? "Host reachable from the victim (service destination)."
                             : "Host reachable from the attacker (service destination)."
                         }
-                      />
+                        />
+
 
                       <PortInput
                         label="Forward Port"
@@ -191,12 +194,6 @@ export default function SSHInputs({
           </div>
         </div>
       </div>
-
-      {!valid && (
-        <p className="text-xs text-red-400 text-center">
-          Complete all required fields to generate commands
-        </p>
-      )}
     </div>
   );
 }

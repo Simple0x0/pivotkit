@@ -2,7 +2,18 @@
 
 import { useState } from "react";
 
-export default function CommandRow({ step, cmd }: { step?: number; cmd: string }) {
+export default function CommandRow({
+  step,
+  cmd,
+  commentClass = "text-sm font-bold font-sans text-zinc-400 break-all leading-relaxed",
+  actionClass = "text-sm font-bold font-sans text-zinc-400 break-all leading-relaxed",
+}: {
+  step?: number;
+  cmd: string;
+  // Tailwind classes for comment (left) and action (right) sections
+  commentClass?: string;
+  actionClass?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   const copy = () => {
@@ -34,7 +45,7 @@ export default function CommandRow({ step, cmd }: { step?: number; cmd: string }
 
     {/* Command + Copy */}
     <div className="flex flex-1 justify-between items-center">
-      <code className="text-sm font-bold font-sans text-zinc-400 break-all leading-relaxed">
+      <code className={cmd.startsWith('#') ? commentClass : actionClass}>
         {cmd}
       </code>
 

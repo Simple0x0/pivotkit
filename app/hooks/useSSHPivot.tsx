@@ -50,8 +50,8 @@ export function useSSHPivot() {
 
   function setMode(mode: SSHMode) {
     setPivot(prev => {
+      // Handle mode-specific defaults
       if (mode === "dynamic") {
-        // Clear forwards, enable SOCKS
         return {
           ...prev,
           mode,
@@ -60,23 +60,29 @@ export function useSSHPivot() {
         };
       }
 
-      // Switching back to local/remote
       return {
         ...prev,
         mode,
         socksPort: undefined,
-        forwards: prev.forwards.length > 0
-          ? prev.forwards // keep existing forwards if any
-          : [
-              {
-                bindPort: 8000,
-                forwardHost: "127.0.0.1",
-                forwardPort: 80,
-              },
-            ], // add default forward if empty
+        forwards:
+          prev.forwards.length > 0
+            ? prev.forwards.map(f => ({
+                ...f,
+                forwardHost:
+                  mode === "local" ? "127.0.0.1" : "",
+              }))
+            : [
+                {
+                  bindPort: 8000,
+                  forwardHost:
+                    mode === "local" ? "127.0.0.1" : "",
+                  forwardPort: 80,
+                },
+              ],
       };
     });
   }
+
 
 
   function addForward() {
