@@ -50,7 +50,7 @@ export default function SSHInputs({
       {/* SSH Pivot Card */}
       <div className="border border-zinc-800 rounded-lg p-4 bg-zinc-900 shadow-xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* ---------------- Target (50%) ---------------- */}
+          {/* ---------------- Target (50% width) ---------------- */}
           <div className="border border-zinc-800 rounded-xl p-3 bg-gray-950 shadow-lg flex flex-col justify-between">
             <div>
               <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">
@@ -59,18 +59,26 @@ export default function SSHInputs({
 
               <div className="flex flex-wrap gap-3 mt-3">
                 <IPInput
-                  label="Target IP"
+                  label="SSH Server IP"
                   value={pivot.targetIP}
                   onChange={v => updatePivot({ targetIP: v })}
-                  placeholder="139.59.91.150"
-                  info="SSH server (victim) IP address the attacker connects to."
+                  placeholder="172.59.91.150"
+                  info={
+                          pivot.mode === "local"
+                            ? "SSH server (VICTIM / TARGET) IP address the ATTACKER connects to."
+                            : "SSH server (ATTACKER) IP address the TARGET connects to."
+                        }
                 />
 
                 <PortInput
                   label="SSH Port"
                   value={pivot.sshPort}
                   onChange={v => updatePivot({ sshPort: v })}
-                  info="SSH service port on the target (default: 22)."
+                  info={
+                          pivot.mode === "local"
+                            ? "SSH service port on the target (default: 22)."
+                            : "SSH service port on the attacker (default: 22)."
+                  }
                 />
 
                 <UsernameInput
@@ -78,14 +86,18 @@ export default function SSHInputs({
                   value={pivot.targetUser}
                   onChange={v => updatePivot({ targetUser: v })}
                   placeholder="Targetuser"
-                  info="Username used to authenticate on the target SSH server."
+                  info={
+                          pivot.mode === "local"
+                            ? "Username used to authenticate on the target SSH server."
+                            : "Username used to authenticate on the attacker SSH server."
+                  }
                 />
 
                 <SSHModeInput
                   label="Mode"
                   value={pivot.mode}
                   onChange={setMode}
-                  info="L: access victim-only services • R: expose attacker/internal services via victim • D: SOCKS pivot through victim"
+                  info="L: access victim internal services  • R: access remote internal services via victim • D: SOCKS pivot through victim"
                 />
               </div>
             </div>
@@ -122,11 +134,7 @@ export default function SSHInputs({
                         onChange={v =>
                           updateForward(i, { bindPort: v })
                         }
-                        info={
-                          pivot.mode === "local"
-                            ? `Port opened on the attacker machine (e.g. 8000) – You can access it via localhost:${f.bindPort}`
-                            : `Port opened on the victim machine and exposed there - You can access it via ${f.forwardHost}:${f.forwardPort}.`
-                        }
+                        info={`Port to be opened on the attacker machine – You can access it via localhost:${f.bindPort}`}
                       />
 
                       <IPInput
@@ -140,8 +148,8 @@ export default function SSHInputs({
                         }
                         info={
                             pivot.mode === "local"
-                            ? "Host reachable from the victim (service destination)."
-                            : "Host reachable from the attacker (service destination)."
+                            ? "Local address of the target (service destination)."
+                            : "Remote address of the target (service destination)."
                         }
                         />
 
@@ -152,7 +160,7 @@ export default function SSHInputs({
                         onChange={v =>
                           updateForward(i, { forwardPort: v })
                         }
-                        info="Destination service port traffic is forwarded to."
+                        info="Which port is the service running on?"
                       />
 
                       <button
@@ -186,8 +194,6 @@ export default function SSHInputs({
                     }
                     info="Local SOCKS proxy port opened on the attacker machine (e.g. 1080)."
                   />
-
-                  <InfoTooltip text="Creates a SOCKS proxy on the attacker. All traffic is pivoted through the victim and appears to originate from its IP." />
                 </div>
               </>
             )}

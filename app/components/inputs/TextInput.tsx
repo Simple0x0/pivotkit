@@ -45,7 +45,7 @@ export function TextInput({
         />
 
         {info && (
-          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 z-10">
             <InfoTooltip text={info} />
           </div>
         )}
