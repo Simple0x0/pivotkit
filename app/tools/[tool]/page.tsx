@@ -1,5 +1,5 @@
 import { loadTools, loadToolById } from "@/app/lib/toolLoader";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import LigoloWorkspace from "@/app/ui/ligolo-ng/Workspace";
 import SSHWorkspace from "@/app/ui/ssh/Workspace";
 import ChiselWorkspace from "@/app/ui/chisel/Workspace";
@@ -73,10 +73,10 @@ export default async function ToolPage({ params }: Props) {
   const { tool } = await params;
 
   const toolData = loadToolById(tool);
-  if (!toolData) return notFound();
+  if (!toolData) redirect("/");
 
   const ToolWorkspace = WORKSPACE_MAP[tool];
-  if (!ToolWorkspace) return notFound();
+  if (!ToolWorkspace) redirect("/");
 
   return (
     <>
