@@ -1,0 +1,23 @@
+id: netsh
+name: "Netsh (Port Proxy)"
+description: "Native Windows port forwarding using netsh interface portproxy — no binary required."
+
+blog: /blogs/netsh
+
+category: port-forward
+
+os:
+  attacker:
+    - windows
+  target:
+    - windows
+
+requires_root: true
+
+capabilities:
+  - port-forward
+
+notes:
+  - "Requires Administrator privileges to add or remove portproxy rules."
+  - "Rules persist across reboots until explicitly deleted with the delete subcommand."
+  - "Living-off-the-land technique — no binary transfer or external tools needed."

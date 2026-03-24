@@ -30,14 +30,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-zinc-950 text-zinc-100">
-        <div className="min-h-screen flex justify-center p-3">
+        <div className="min-h-screen flex justify-center p-3 ">
           {/* Use flex-col on small screens, flex-row on lg */}
           <div className="w-full lg:w-4/5 bg-zinc-900 rounded-2xl shadow-lg flex flex-col lg:flex-row">
 
             {/* Main Content */}
             <main className="flex-1 p-6">
               <header className="text-center mb-6">
-                <h1 className="text-4xl font-semibold">Pivoting ToolKits</h1>
+                <h1 className="text-4xl font-semibold">PivotKit</h1>
                 <p className="text-zinc-400 mt-2 text-[10px]">Attacker / Pentester Perspective</p>
               </header>
 

@@ -1,0 +1,24 @@
+id: socat
+name: Socat
+description: "Raw TCP/UDP stream relay for simple port forwarding and pivot chains."
+
+blog: /blogs/socat
+
+category: port-forward
+
+os:
+  attacker:
+    - linux
+  target:
+    - linux
+
+requires_root: false
+
+capabilities:
+  - port-forward
+  - reverse-connection
+
+notes:
+  - "socat is often already present on Linux targets — no binary transfer required."
+  - "Use the fork option with TCP-LISTEN to handle multiple concurrent connections."
+  - "tty-shell mode creates a fully interactive PTY reverse shell."

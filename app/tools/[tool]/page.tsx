@@ -2,6 +2,10 @@ import { loadTools, loadToolById } from "@/app/lib/toolLoader";
 import { notFound } from "next/navigation";
 import LigoloWorkspace from "@/app/ui/ligolo-ng/Workspace";
 import SSHWorkspace from "@/app/ui/ssh/Workspace";
+import ChiselWorkspace from "@/app/ui/chisel/Workspace";
+import SocatWorkspace from "@/app/ui/socat/Workspace";
+import NetshWorkspace from "@/app/ui/netsh/Workspace";
+import RpivotWorkspace from "@/app/ui/rpivot/Workspace";
 import type { Metadata } from "next";
 import React from "react";
 
@@ -25,7 +29,6 @@ export async function generateMetadata(
   const title = `${toolData.name} | PivotKit`;
   const description = toolData.description;
   const image = toolData.image ?? DEFAULT_IMAGE;
-  console.log("Generating metadata for", tool, "with image", image);
   return {
     title,
     description,
@@ -54,7 +57,10 @@ export async function generateMetadata(
 const WORKSPACE_MAP: Record<string, React.FC> = {
   "ligolo-ng": LigoloWorkspace,
   "ssh": SSHWorkspace,
-  // future tools here
+  "chisel": ChiselWorkspace,
+  "socat": SocatWorkspace,
+  "netsh": NetshWorkspace,
+  "rpivot": RpivotWorkspace,
 };
 
 /* ---------------- Page ---------------- */

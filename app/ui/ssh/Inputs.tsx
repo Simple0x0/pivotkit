@@ -4,7 +4,6 @@ import { IPInput } from "@/app/components/inputs/IPInput";
 import { PortInput } from "@/app/components/inputs/PortInput";
 import { SSHModeInput } from "@/app/components/inputs/SSHModeInput";
 import { TextInput as UsernameInput } from "@/app/components/inputs/TextInput";
-import InfoTooltip from "@/app/components/InfoTooltip";
 import { SSHPivot, SSHForward } from "@/app/hooks/useSSHPivot";
 
 /* ---------------- Validation ---------------- */
@@ -85,7 +84,7 @@ export default function SSHInputs({
                   label="SSH User"
                   value={pivot.targetUser}
                   onChange={v => updatePivot({ targetUser: v })}
-                  placeholder="Targetuser"
+                  placeholder="Username"
                   info={
                           pivot.mode === "local"
                             ? "Username used to authenticate on the target SSH server."

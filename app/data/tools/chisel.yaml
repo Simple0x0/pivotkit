@@ -1,0 +1,28 @@
+id: chisel
+name: Chisel
+description: "HTTP-tunnelled TCP/UDP pivot using a client/server model over SSH transport."
+
+blog: /blogs/chisel
+
+category: socks
+
+os:
+  attacker:
+    - linux
+    - windows
+    - macos
+  target:
+    - linux
+    - windows
+
+requires_root: false
+
+capabilities:
+  - port-forward
+  - reverse-connection
+  - requires-agent
+
+notes:
+  - "The server runs on the attacker or a pivot host; the client runs on the target."
+  - "Use R:socks as the tunnel argument for a reverse SOCKS5 proxy."
+  - "Binaries available at https://github.com/jpillora/chisel/releases"

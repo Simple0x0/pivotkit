@@ -4,9 +4,10 @@ import { IPInput } from "@/app/components/inputs/IPInput";
 import { PortInput } from "@/app/components/inputs/PortInput";
 import { OSInput } from "@/app/components/inputs/OSInput";
 import { CIDRInput } from "@/app/components/inputs/CIDRInput";
+import { LigoloPivot } from "@/app/hooks/useLigoloPivotChain";
 
 /* ---------------- Validation ---------------- */
-const isPivotValid = (pivot: any) => {
+const isPivotValid = (pivot: LigoloPivot) => {
   if (!pivot.attackerPort) return false;
   if (!pivot.network) return false;
   if (!pivot.cidr) return false;
@@ -28,8 +29,8 @@ export default function LigoloInputs({
   addPivot,
   removePivot,
 }: {
-  pivots: any[];
-  updatePivot: (i: number, patch: any) => void;
+  pivots: LigoloPivot[];
+  updatePivot: (i: number, patch: Partial<LigoloPivot>) => void;
   addPivot: () => void;
   removePivot: (i: number) => void;
 }) {
@@ -44,8 +45,8 @@ export default function LigoloInputs({
           Attacker (TUN)
         </span>
 
-        {pivots.map((_, idx) => (
-          <div key={idx} className="flex items-center gap-2">
+        {pivots.filter(p => p.role === "relay").map((_, idx) => (
+          <div key={`relay-${idx}`} className="flex items-center gap-2">
             <span className="text-zinc-500">→</span>
             <span
               className={`px-2 py-1 rounded ${
@@ -130,7 +131,7 @@ export default function LigoloInputs({
                   {isEntry && (
                     <OSInput
                       label="Target OS"
-                      value={pivot.targetOS}
+                      value={(pivot.targetOS === "macos" ? "linux" : pivot.targetOS) ?? "linux"}
                       onChange={(v) => updatePivot(idx, { targetOS: v })}
                       info="Operating system of the target machine (default: linux)."
                     />
@@ -147,7 +148,7 @@ export default function LigoloInputs({
                       <div className="flex flex-row flex-wrap gap-3 mt-2">
                         <IPInput
                           label="Compromised Host IP"
-                          value={pivot.targetIP}
+                          value={pivot.targetIP ?? ""}
                           onChange={(v) => updatePivot(idx, { targetIP: v })}
                           info={`IP address of the previously compromised host (Relay ${idx}) providing access to the new network.`}
                           placeholder="e.g. 10.10.30.1"
@@ -155,7 +156,7 @@ export default function LigoloInputs({
 
                         <PortInput
                           label="Target Port"
-                          value={pivot.targetPort}
+                          value={pivot.targetPort ?? 0}
                           onChange={(v) => updatePivot(idx, { targetPort: v })}
                           info="Port exposed on the previously compromised host to relay traffic."
                         />
@@ -164,7 +165,7 @@ export default function LigoloInputs({
                     <div className="mt-4">
                       <OSInput
                         label="Target OS"
-                        value={pivot.targetOS}
+                        value={(pivot.targetOS === "macos" ? "linux" : pivot.targetOS) ?? "linux"}
                         onChange={(v) => updatePivot(idx, { targetOS: v })}
                         info="Operating system of the previously compromised host."
                       />

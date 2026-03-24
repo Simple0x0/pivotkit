@@ -41,7 +41,7 @@ export default function LigoloCommandsDisplay({
             </div>
 
             {/* -------- Pivot Card -------- */}
-            <div className="rounded-xl border border-zinc-800 bg-gray-950 bg-black/40 shadow-lg p-5">
+            <div className="rounded-xl border border-zinc-800 bg-gray-950 shadow-lg p-5">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative">
                 <CommandPanel title="Attacker" steps={cmds.attacker} />
 

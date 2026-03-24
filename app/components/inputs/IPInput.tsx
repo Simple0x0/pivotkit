@@ -32,7 +32,7 @@ export function IPInput({
           className={`
             w-full
             bg-zinc-900
-            border border-gray-100 rounded-lg
+            border border-zinc-700 rounded-lg
             px-3 py-2 pr-8
             text-sm text-white
             placeholder-zinc-500

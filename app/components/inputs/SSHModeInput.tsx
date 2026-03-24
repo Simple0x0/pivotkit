@@ -1,8 +1,9 @@
 "use client";
 
 import InfoTooltip from "@/app/components/InfoTooltip";
+import { SSHMode } from "@/app/hooks/useSSHPivot";
 
-export type SSHMode = "local" | "remote" | "dynamic";
+export type { SSHMode };
 
 export function SSHModeInput({
   label,

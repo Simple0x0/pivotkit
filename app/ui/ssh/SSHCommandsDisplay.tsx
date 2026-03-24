@@ -15,11 +15,10 @@ export default function SSHCommandsDisplay({
     if (!pivot) return null;
 
     const cmds = resolvedCommands ?? { attacker: [], target: [] };
-
     return (
-        <div className="rounded-xl border border-zinc-800 bg-gray-950 bg-black/40 shadow-lg p-5">
+        <div className="rounded-xl border border-zinc-800 bg-gray-950 shadow-lg p-5">
             <CommandPanel
-                title="Attacker"
+                title={pivot.mode === "remote" ? "Target" : "Attacker"}
                 steps={cmds.attacker}
                 commentStyle="text-sm font-mono text-zinc-500 italic break-all leading-relaxed"
             />

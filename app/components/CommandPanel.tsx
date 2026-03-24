@@ -15,7 +15,7 @@ export default function CommandPanel({
   actionStyle?: string;
 }) {
   return (
-    <div className="rounded-lg  p-4 space-y-3">
+    <div className="rounded-lg p-4 space-y-3">
       <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">
         On {title}
       </h4>

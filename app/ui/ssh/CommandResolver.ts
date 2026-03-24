@@ -14,8 +14,8 @@ export function resolvePivotCommands(pivot: SSHPivot): PivotCommands {
 
     // Fill sensible defaults / placeholders so the UI shows commands even
     // when the user hasn't entered everything yet.
-    const targetIP = pivot.targetIP?.trim() ? pivot.targetIP : "<TARGET_IP>";
-    const targetUser = pivot.targetUser?.trim() ? pivot.targetUser : "<TARGET_USER>";
+    const targetIP = pivot.targetIP?.trim() ? pivot.targetIP : "<SSHSERVER_IP>";
+    const targetUser = pivot.targetUser?.trim() ? pivot.targetUser : "<SSH_USER>";
     const sshPort = pivot.sshPort ?? 22;
     const portArg = sshPort === 22 ? "" : `-p ${sshPort}`;
 
@@ -67,9 +67,10 @@ export function resolvePivotCommands(pivot: SSHPivot): PivotCommands {
                 command: `# Access:  http://localhost:${f.bindPort}`,
             });
         } else {
+            const remoteTarget = pivot.targetIP?.trim() ? pivot.targetIP : "<TARGET_IP>";
             cmds.attacker.push({
                 step: step++,
-                command: `# Access:  http://localhost:${f.bindPort}`,
+                command: `# Access:  http://${remoteTarget}:${f.bindPort}`,
             });
         }
     }
