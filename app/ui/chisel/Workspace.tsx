@@ -13,6 +13,9 @@ export default function ChiselWorkspace() {
     addForward,
     updateForward,
     removeForward,
+    addRelay,
+    updateRelay,
+    removeRelay,
   } = useChiselPivot();
 
   const resolvedCommands = resolvePivotCommands(pivot);
@@ -26,6 +29,9 @@ export default function ChiselWorkspace() {
         addForward={addForward}
         updateForward={updateForward}
         removeForward={removeForward}
+        addRelay={addRelay}
+        updateRelay={updateRelay}
+        removeRelay={removeRelay}
       />
       <ChiselCommandsDisplay pivot={pivot} resolvedCommands={resolvedCommands} />
     </div>
