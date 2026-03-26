@@ -1,67 +1,87 @@
-Netsh is a Windows built-in command-line utility that manages network settings on Windows hosts. Its `interface portproxy` subcommand configures persistent port-forwarding rules that redirect TCP traffic from one address and port to another. Critically, this requires no external binary — netsh ships with every Windows installation from XP onward, making it the canonical living-off-the-land (LotL) port forwarding technique on Windows.
+Netsh is a Windows built-in command-line utility for managing network settings. Its `interface portproxy` subcommand sets up TCP port-forwarding rules — redirecting traffic arriving on one address and port to another destination. No binary upload required. No external tools. It ships with every Windows installation from XP onward, making it the quintessential **living-off-the-land (LotL)** pivot technique on Windows.
 
-When you have a foothold on a Windows machine that sits between the attacker and a network segment, netsh portproxy turns that machine into a TCP relay with a single administrative command. No agent upload. No download. No dependency. The only requirement is that the user context has Administrator privileges, because netsh portproxy modifies system networking state.
+When you have a foothold on a Windows host that bridges two networks, netsh turns that machine into a TCP relay with a single command.
 
 ### Why Netsh?
 
-Every other tunnelling technique covered in these guides requires uploading a binary to the target. Netsh eliminates that risk entirely. Binary transfers are a common detection vector: AV scans new executables, EDR solutions flag unknown or unsigned binaries, and blue teams monitor for unusual executables in temp directories. When a compromised Windows host has Administrator access, netsh portproxy is often the lowest-footprint method available.
+| Feature          | Netsh         | Socat (Linux)  | Chisel          |
+| ---------------- | ------------- | -------------- | --------------- |
+| Needs binary     | No (built-in) | Often built-in | Yes             |
+| OS               | Windows only  | Linux          | Both            |
+| Encryption       | No            | No             | Yes (TLS)       |
+| SOCKS proxy      | No            | No             | Yes             |
+| Protocol         | TCP only      | TCP + UDP      | TCP + UDP       |
+| Persistence      | Reboot-safe   | No             | No              |
 
-The tradeoff is a narrow feature set: TCP only, no encryption, no SOCKS proxy, no multi-hop chaining beyond manually configuring multiple rules across multiple hosts.
+The single biggest advantage: **zero footprint**. No new file on disk, no suspicious network download, no unsigned binary for EDR to flag. If you have Administrator, you have a pivot.
 
 ### TL;DR
 
 ```batch
-rem Add the rule (Administrator required)
-netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=8080 connectaddress=10.10.30.200 connectport=80
+rem Add the port proxy rule
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=8080 connectaddress=10.10.10.200 connectport=80
 
-rem Verify
+rem Verify the rule is active
 netsh interface portproxy show all
 
-rem Allow inbound traffic through Windows Firewall
+rem Allow inbound connections through Windows Firewall
 netsh advfirewall firewall add rule name="Pivot-8080" protocol=TCP dir=in localport=8080 action=allow
 
-rem Cleanup
+rem Cleanup when done
 netsh interface portproxy delete v4tov4 listenaddress=0.0.0.0 listenport=8080
+netsh advfirewall firewall delete rule name="Pivot-8080"
 ```
 
 ### Requirements
 
-Administrator privileges are mandatory. Running netsh portproxy as a standard user returns "Access is denied." If your shell is running as a low-privileged user, you must escalate privileges first.
-
-Windows Firewall is active by default and will block inbound connections to the listener port unless an explicit allow rule is added. The firewall rule addition is a separate netsh command and is included in the steps below.
+- **Administrator privileges** — mandatory. Running portproxy as a standard user returns "Access is denied."  
+- **Windows Firewall** — active by default; you must add an allow rule for the listener port.
 
 > [!NOTE]
-> Portproxy rules created with netsh persist across reboots. They are stored in the registry under HKLM\SYSTEM\CurrentControlSet\Services\PortProxy. This means if you forget to clean up, the rule will still be active after the machine reboots and may expose internal services indefinitely.
+> Portproxy rules persist across reboots — they are stored in the registry under `HKLM\SYSTEM\CurrentControlSet\Services\PortProxy`. If you forget to clean up, the rule stays active after a reboot and continues exposing internal services.
 
 ### Lab Topology
 
-| Host                    | Primary IP    | Secondary IP  | Open Ports      | Role           |
-| ----------------------- | ------------- | ------------- | --------------- | -------------- |
-| Attacker (Kali)         | 192.168.1.10  | N/A           | N/A             | Attack Box     |
-| Windows Proxy Host      | 192.168.1.13  | 10.10.30.201  | 8080 (proxied)  | Jump Host      |
-| Internal Target         | 10.10.30.200  | N/A           | 80, 3389        | Internal Host  |
+| Host             | Primary IP    | Secondary IP  | Open Ports       | Role           |
+| ---------------- | ------------- | ------------- | ---------------- | -------------- |
+| Attacker (Kali)  | 192.168.1.10  | N/A           | N/A              | Attack Box     |
+| Web DMZ          | 192.168.1.20  | 10.10.10.100  | 80 (outbound)    | Jump Host      |
+| Admin Mgmt       | 10.10.10.200  | 10.10.20.100  | 80               | Internal Host  |
+| Internal File srv| 10.10.20.200  | 10.10.30.100  | 80, 445          | Internal Host  |
 
-The attacker has Administrator access to the Windows Proxy Host and cannot reach the Internal Target directly.
+The attacker cannot reach `10.10.10.200` directly. Web DMZ is a Windows host with Administrator access, sitting between both networks. We'll configure it to relay traffic for us.
 
-### Step 1: Add the Port Proxy Rule
+![Image: Lab topology — attacker, Windows Web DMZ pivot, internal Admin Mgmt host](placeholder)
 
-Open an Administrator command prompt or PowerShell session on the Windows Proxy Host and run:
+---
+
+### Port Forwarding with Netsh
+
+Netsh has one mode: TCP port forwarding. There is no local/remote distinction like in Chisel or SSH — you simply configure a rule that says "any connection arriving at this host on this port gets forwarded to that host on that port." It is always the proxy host itself that listens and forwards.
+
+#### Step 1: Add the Port Proxy Rule
+
+On Web DMZ (the Windows pivot), open an Administrator command prompt and run:
 
 ```batch
-netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=8080 connectaddress=10.10.30.200 connectport=80
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=8080 connectaddress=10.10.10.200 connectport=80
 ```
 
-Breaking down the arguments:
+Argument breakdown:
 
-- `v4tov4` — both the listen side and connect side use IPv4. Other valid values are `v4tov6`, `v6tov4`, `v6tov6`.
-- `listenaddress=0.0.0.0` — listen on all available network interfaces. Use a specific IP to restrict the listener to one interface.
-- `listenport=8080` — the port that will accept inbound connections on the proxy host.
-- `connectaddress=10.10.30.200` — the destination IP that inbound connections will be forwarded to.
-- `connectport=80` — the port at the destination.
+| Argument            | Meaning                                                       |
+| ------------------- | ------------------------------------------------------------- |
+| `v4tov4`            | IPv4 → IPv4 forwarding (also: `v4tov6`, `v6tov4`, `v6tov6`) |
+| `listenaddress=0.0.0.0` | Listen on all interfaces of the proxy host                |
+| `listenport=8080`   | Port that accepts inbound connections on Web DMZ              |
+| `connectaddress`    | Internal destination IP (Admin Mgmt)                          |
+| `connectport`       | Port on the destination to connect to                         |
 
-When a client connects to `192.168.1.13:8080`, Windows silently forwards that connection to `10.10.30.200:80`. The forwarding is transparent — the destination service sees a connection originating from the proxy host.
+When a connection arrives at `192.168.1.20:8080`, Windows silently forwards it to `10.10.10.200:80`. The destination sees the connection coming from Web DMZ's internal IP (`10.10.10.100`), not from the attacker.
 
-### Step 2: Verify the Rule
+![Image: Netsh portproxy rule added on Web DMZ — terminal output](placeholder)
+
+#### Step 2: Verify the Rule
 
 ```batch
 netsh interface portproxy show all
@@ -74,100 +94,142 @@ Listen on ipv4:             Connect to ipv4:
 
 Address         Port        Address         Port
 --------------- ----------  --------------- ----------
-0.0.0.0         8080        10.10.30.200    80
+0.0.0.0         8080        10.10.10.200    80
 ```
 
-If the rule does not appear, verify that you ran the command with Administrator privileges.
+If the rule doesn't appear, you ran the command without Administrator privileges.
 
-### Step 3: Add the Firewall Rule
+#### Step 3: Open the Firewall
 
-By default, Windows Firewall will block inbound connections to the new listener port. Add an allow rule:
+Windows Firewall blocks inbound connections by default. Add an allow rule for the listener port:
 
 ```batch
 netsh advfirewall firewall add rule name="Pivot-8080" protocol=TCP dir=in localport=8080 action=allow
 ```
 
-You can verify the firewall rule was added:
+Verify it was created:
 
 ```batch
 netsh advfirewall firewall show rule name="Pivot-8080"
 ```
 
 > [!NOTE]
-> If the Windows host is domain-joined, Group Policy may override local firewall rules or push new firewall policies that remove your rule. Check whether the firewall state changes after a Group Policy refresh.
+> On domain-joined machines, Group Policy may override local firewall rules or remove your entry after a GPO refresh. Check whether your rule survives a `gpupdate /force`.
 
-### Step 4: Access the Internal Service
+![Image: Firewall rule added — netsh advfirewall confirmation output](placeholder)
 
-From the attacker:
+#### Step 4: Access the Internal Service from the Attacker
 
 ```bash
-curl http://192.168.1.13:8080
+# HTTP service on Admin Mgmt
+curl http://192.168.1.20:8080
+
+# RDP to Admin Mgmt through the proxy
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=3390 connectaddress=10.10.10.200 connectport=3389
+# then from attacker:
+rdesktop 192.168.1.20:3390
 ```
 
-The request goes to the Windows proxy on port 8080, gets forwarded to `10.10.30.200:80`, and the response returns through the same path.
+The attacker connects to Web DMZ on the proxied port, and the traffic arrives at the internal host seamlessly.
 
-For RDP access through the proxy:
+![Image: Curl from attacker receiving response from internal Admin Mgmt via port proxy](placeholder)
 
-```batch
-netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=3390 connectaddress=10.10.30.200 connectport=3389
-```
+#### Step 5: Cleanup
 
-Then connect from the attacker: `rdesktop 192.168.1.13:3390`
-
-### Step 5: Cleanup
-
-When the operation is complete, remove the portproxy rule and the firewall rule to restore the host to its original state:
+Remove the portproxy rule and firewall entry when done:
 
 ```batch
-rem Delete the portproxy rule
+rem Remove portproxy rule
 netsh interface portproxy delete v4tov4 listenaddress=0.0.0.0 listenport=8080
 
-rem Delete the firewall rule
+rem Remove firewall rule
 netsh advfirewall firewall delete rule name="Pivot-8080"
-```
 
-Verify cleanup:
-
-```batch
+rem Confirm clean state
 netsh interface portproxy show all
 ```
 
-The output should be empty or show no entries for the port you removed.
+The output should be empty or show no remaining entries for the ports you removed.
+
+---
+
+### Double Pivoting (Reaching a Third Network)
+
+You've reached Admin Mgmt (`10.10.10.200`) through Web DMZ. Now you need to go one level deeper — to Internal File Server at `10.10.20.200`, a network only Admin Mgmt can reach.
+
+The strategy: add a second portproxy rule on Web DMZ that forwards a new port to Admin Mgmt's internal interface, and then configure Admin Mgmt to forward that traffic to the final target.
+
+> The key limitation: you need Administrator access on **each** Windows host in the chain.
+
+![Image: Double pivot — attacker → Web DMZ → Admin Mgmt → Internal File Server](placeholder)
+
+#### Step 1: Configure Admin Mgmt as a Second Relay
+
+On Admin Mgmt (`10.10.10.200`), add a portproxy rule to forward traffic to the Internal File Server:
+
+```batch
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=9090 connectaddress=10.10.20.200 connectport=80
+netsh advfirewall firewall add rule name="Pivot2-9090" protocol=TCP dir=in localport=9090 action=allow
+```
+
+Admin Mgmt now listens on port 9090 and relays to `10.10.20.200:80`.
+
+#### Step 2: Chain Through Web DMZ
+
+On Web DMZ, add a second portproxy rule to forward a new port to Admin Mgmt's new listener:
+
+```batch
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=9090 connectaddress=10.10.10.200 connectport=9090
+netsh advfirewall firewall add rule name="Pivot-9090" protocol=TCP dir=in localport=9090 action=allow
+```
+
+#### Step 3: Access the Third Layer from the Attacker
+
+```bash
+curl http://192.168.1.20:9090
+```
+
+Traffic flows: Attacker → Web DMZ:9090 → Admin Mgmt:9090 → Internal File Server:80.
+
+![Image: Two-hop netsh chain — traffic flowing through both pivot hosts to Internal File Server](placeholder)
+
+> [!NOTE]
+> Each hop is a separate portproxy rule on a separate host. This scales linearly but requires Administrator on every jump box. For complex chains, Ligolo-ng or Chisel are better choices.
+
+---
 
 ### Operational Security Notes
 
-Portproxy rules are visible via `netsh interface portproxy show all` and via `netstat -ano` which will show the listening TCP socket. Any red team operation that enumerates open ports on the proxy host will see the listener. On a heavily monitored host, a new listening port on an unusual port number may trigger an alert. Consider using a port that blends with normal business traffic (e.g., 443, 8443, 3389 if those are already expected).
-
-Portproxy rule creation is logged in the Windows Security Event Log if object access auditing is enabled. The registry keys under HKLM\SYSTEM\CurrentControlSet\Services\PortProxy are modified — forensic analysis will find evidence of portproxy configuration even after cleanup because registry hives are backed up in volume shadow copies.
-
-Netsh portproxy only supports TCP. It cannot forward UDP. For UDP services like DNS or SNMP, use socat or another tool on a Linux relay.
+- Portproxy rules are visible via `netsh interface portproxy show all` and in `netstat -ano` as a new listening TCP socket. A new listening port on an unusual number may trigger alerting on monitored hosts. Consider using ports that blend with expected traffic (e.g., 443, 8443).
+- Rule creation modifies the registry — forensic analysis will find evidence even after cleanup because registry hives are backed up in Volume Shadow Copies.
+- Netsh portproxy is **TCP only**. For UDP forwarding (DNS, SNMP), use socat on a Linux relay.
 
 ### Troubleshooting
 
-Add command returns "Access is denied": You are not running as Administrator. Open an elevated command prompt or use `runas /user:COMPUTERNAME\Administrator cmd`.
+**"Access is denied":** Run the command in an elevated prompt. Right-click → "Run as Administrator" or use `runas /user:HOSTNAME\Administrator cmd`.
 
-Rule exists but connections are refused: The Windows Firewall allow rule may be missing or overridden by GPO. Check with `netsh advfirewall show currentprofile state`.
+**Rule exists but connection refused:** The firewall allow rule is missing or overridden by GPO. Check with `netsh advfirewall show currentprofile state`.
 
-Rule exists and firewall is configured but connections still fail: Verify that the destination service is actually running and listening on the connectaddress and connectport. Test from the proxy host directly: `telnet 10.10.30.200 80`.
+**Rule and firewall are correct but connection still fails:** Verify the destination service is actually running. Test from Web DMZ directly: `telnet 10.10.10.200 80` or `Test-NetConnection -ComputerName 10.10.10.200 -Port 80` in PowerShell.
 
-Multiple rules causing confusion: Run `netsh interface portproxy show all` to list all active rules. Delete specific rules using the listenaddress and listenport to identify them.
+**Multiple rules causing confusion:** `netsh interface portproxy show all` lists every rule. Delete by specifying the exact `listenaddress` and `listenport` combination.
 
 ### Quick Reference
 
-| Action          | Command                                                                                 |
-| --------------- | ----------------------------------------------------------------------------------------|
+| Action          | Command                                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------------------- |
 | Add rule        | `netsh interface portproxy add v4tov4 listenaddress=LADDR listenport=LPORT connectaddress=CADDR connectport=CPORT` |
-| Show rules      | `netsh interface portproxy show all`                                                    |
-| Allow firewall  | `netsh advfirewall firewall add rule name="NAME" protocol=TCP dir=in localport=PORT action=allow` |
-| Delete rule     | `netsh interface portproxy delete v4tov4 listenaddress=LADDR listenport=LPORT`          |
-| Delete firewall | `netsh advfirewall firewall delete rule name="NAME"`                                    |
+| Show rules      | `netsh interface portproxy show all`                                                                  |
+| Allow firewall  | `netsh advfirewall firewall add rule name="NAME" protocol=TCP dir=in localport=PORT action=allow`     |
+| Delete rule     | `netsh interface portproxy delete v4tov4 listenaddress=LADDR listenport=LPORT`                        |
+| Delete firewall | `netsh advfirewall firewall delete rule name="NAME"`                                                  |
 
 ### When to Use Netsh vs Alternatives
 
-Use netsh when: the pivot host is Windows, you have Administrator access, and you want to avoid transferring any binary. It is the ideal LotL technique on Windows segment bridges.
+Use **netsh** when: the pivot is Windows, you have Administrator access, and you want zero new files on disk. It is the ideal LotL technique on Windows segment bridges.
 
-Use socat when: the pivot host is Linux and you want the same simplicity with a tool that is likely already installed.
+Use **socat** when: the pivot is Linux and you want the same simplicity with a tool that is often already installed.
 
-Use Chisel when: you need encryption, a SOCKS proxy, or the firewall blocks your relay but allows outbound HTTP.
+Use **Chisel** when: you need encryption, a SOCKS5 proxy, or outbound HTTP is the only permitted protocol.
 
-Use Ligolo-ng when: you need full native routing across multiple hops without configuring individual forwards per service.
+Use **Ligolo-ng** when: you need full native routing across multiple hops without per-service port forward configuration.
