@@ -289,8 +289,6 @@ Web DMZ's SOCKS5 proxy (from Admin Mgmt's tunnel) now lives at `127.0.0.1:1080` 
 
 This opens port `1081` on the attacker. Connecting to `localhost:1081` on the attacker hits Web DMZ's SOCKS5 proxy, which tunnels through to Admin Mgmt and reaches `10.10.20.0/24`.
 
-![Image: Chain — Admin Mgmt SOCKS5 relayed via Web DMZ back to attacker on port 1081](placeholder)
-
 #### Step 4: Configure a Second Proxychains Profile on the Attacker
 
 Create `proxychains_hop2.conf`:
