@@ -2,7 +2,7 @@ id: chisel
 name: Chisel
 description: "HTTP-tunnelled TCP/UDP pivot using a client/server model over SSH transport."
 
-blog: /blogs/chisel
+blog: https://teamsimple.net/blogs/chisel-http-tunneling-pivoting
 
 category: socks
 

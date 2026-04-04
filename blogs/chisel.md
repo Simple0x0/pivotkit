@@ -1,3 +1,4 @@
+
 Chisel is a fast TCP/UDP tunnelling tool that wraps all traffic inside an HTTP stream. It works on a **client/server model**: the server runs on your attacker machine, and the client runs on the compromised pivot host. No SSH daemon is needed — just a single binary, transferred and executed.
 
 This makes Chisel ideal when SSH is blocked but outbound HTTP on port 80 or 443 is permitted. Traffic blends in with normal web activity, and adding TLS makes it indistinguishable from HTTPS.
@@ -78,7 +79,7 @@ For Windows targets, download `chisel_windows_amd64.gz`, extract it, and transfe
 > [!NOTE]
 > Chisel is a single statically-linked binary — no dependencies, no install needed. Transfer it, run it, done.
 
-![Image: Chisel GitHub releases page](./chisel_images/chisel_github.png)
+![Image: Chisel GitHub releases page](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/chisel_github.png)
 
 ### Lab Topology
 
@@ -91,7 +92,7 @@ For Windows targets, download `chisel_windows_amd64.gz`, extract it, and transfe
 
 The attacker cannot reach `10.10.10.200` directly. Web DMZ is the pivot: it can reach both the attacker and the internal network. Chisel runs on the attacker (server) and on Web DMZ (client).
 
-![Image: Lab topology diagram — attacker, Web DMZ pivot, internal network](./chisel_images/Lab_topology.png)
+![Image: Lab topology diagram — attacker, Web DMZ pivot, internal network](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Lab_topology.png)
 
 ---
 
@@ -129,7 +130,7 @@ In our scenario our target is **web@webDMZ | 192.168.1.20  | 10.10.10.100** pres
 ```bash
 ./chisel server --port 8080
 ```
-![Image: Chisel server execution on the target](./chisel_images/chiser_server_on_target.png)
+![Image: Chisel server execution on the target](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/chiser_server_on_target.png)
 
 
 **Client** (Our attacker box in this our Scenario)
@@ -137,11 +138,11 @@ The target has a **local port 8401 open** which can't be accessed directly from 
 ```bash
 ./chisel client SERVER_IP:8080 8000:TARGET_IP:TARGET_PORT
 ```
-![Image: Chisel client execution on the attacker](./chisel_images/chise_Client_connect_from_attacker.png)
+![Image: Chisel client execution on the attacker](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/chise_Client_connect_from_attacker.png)
 
 Port `8000` opens on the **client machine = attack box**, not the server. The server connects to `TARGET_IP:TARGET_PORT`. Now we can access the service from our attack box.
 
-![Image: Access to the local server from our attack box](./chisel_images/Access_toInternal-WebDMZ.png)
+![Image: Access to the local server from our attack box](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Access_toInternal-WebDMZ.png)
 
 ---
 
@@ -164,7 +165,7 @@ Port `8000` opens on the **client machine = attack box**, not the server. The se
 
 `--reverse` tells the server to allow clients to open listening ports on it.
 
-![Image: Chisel server starting on attacker with --reverse flag](./chisel_images/Reverse_ServerOn_attacker.png)
+![Image: Chisel server starting on attacker with --reverse flag](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Reverse_ServerOn_attacker.png)
 
 #### Step 2: Run the Chisel Client on Web DMZ
 
@@ -178,7 +179,7 @@ Breaking this down:
 - `8000` — port that opens on the **attacker** at `localhost:8000`
 - `10.10.10.200:80` — where Web DMZ (client) will connect to on behalf of incoming traffic
 
-![Image: Web DMZ running Chisel client with R: tunnel — port 8000 opens on attacker](./chisel_images/Reverse_ClientConnect_Server.png)
+![Image: Web DMZ running Chisel client with R: tunnel — port 8000 opens on attacker](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Reverse_ClientConnect_Server.png)
 On the server we can see `2026/03/26 18:13:23 server: session#1: tun: proxy#R:8000=>10.10.10.200:80: Listening`
 
 **Result:** Any connection to `localhost:8000` on the attacker is forwarded through the tunnel to Web DMZ, and Web DMZ connects to `10.10.10.200:80`. The internal service sees the connection originating from Web DMZ's internal IP (`10.10.10.100`).
@@ -189,7 +190,7 @@ On the server we can see `2026/03/26 18:13:23 server: session#1: tun: proxy#R:80
 # From the attacker — port 8000 is local to the attacker
 curl http://localhost:8000
 ```
-![Image: Access to the a specific know internal host from our attack box](./chisel_images/Reverse_AccessToInternal_Network.png)
+![Image: Access to the a specific know internal host from our attack box](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Reverse_AccessToInternal_Network.png)
 
 > [!TIP]
 > Stack multiple reverse tunnels in one command:
@@ -211,7 +212,7 @@ curl http://localhost:8000
 
 - `--reverse` — allows the client to open reverse tunnels on the server
 - `--socks5` — enables SOCKS5 proxy mode; a SOCKS5 listener will appear on port 1080
-![Image: Chisel Server reverse SOCKS5  ](./chisel_images/Socks-ServerOnAttacker.png)
+![Image: Chisel Server reverse SOCKS5  ](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Socks-ServerOnAttacker.png)
 
 #### Step 2: Run the Chisel Client on Web DMZ
 
@@ -221,7 +222,7 @@ curl http://localhost:8000
 
 `R:socks` tells the client to set up a reverse SOCKS5 tunnel back to the server.
 
-![Image: Chisel reverse SOCKS5 tunnel — client connects back to attacker server](./chisel_images/socks_clientConnects_Server.png)
+![Image: Chisel reverse SOCKS5 tunnel — client connects back to attacker server](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/socks_clientConnects_Server.png)
 
 #### Step 3: Configure Proxychains on the Attacker
 
@@ -243,7 +244,7 @@ proxychains ssh bella@10.10.10.200
 > [!NOTE]
 > Always use `nmap -sT` (TCP connect scan) through a SOCKS proxy — SYN scans require raw sockets and cannot be proxied.
 
-![Image: proxychains output ssh to 10.10. via SOCKS5 tunnel](./chisel_images/socks_SSH_ToPivotmgmt.png)
+![Image: proxychains output ssh to 10.10. via SOCKS5 tunnel](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/socks_SSH_ToPivotmgmt.png)
 
 ---
 
@@ -299,7 +300,7 @@ Create `proxychains_hop2.conf`:
 socks5 127.0.0.1 1081
 ```
 
-![Image: Double pivot topology — attacker → Web DMZ → Admin Mgmt → Internal File Server](./chisel_images/Double_setups.png)
+![Image: Double pivot topology — attacker → Web DMZ → Admin Mgmt → Internal File Server](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Double_setups.png)
 
 #### Step 5: Reach the Third Network
 
@@ -309,12 +310,12 @@ proxychains -f ./proxychains_hop2.conf curl http://10.10.20.200
 ```
 
 #### Firefox Socks5 Configs and SSH access
-![Image: Double pivot Configgure - Firefox socks5](./chisel_images/Double_Socks5config_Firefox.png)
+![Image: Double pivot Configgure - Firefox socks5](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Double_Socks5config_Firefox.png)
 
-![Image: Double pivot - access Internal File Server](./chisel_images/Double_AccessToInternalFiles.png)
+![Image: Double pivot - access Internal File Server](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Double_AccessToInternalFiles.png)
 
 Connecting via SSH
-![Image: Double pivot - SSH to intternal FIle server](./chisel_images/Double_SSH_to_InternalFIles.png)
+![Image: Double pivot - SSH to intternal FIle server](https://teamsimple.net/api/files/blogs/blogs-daa143fc67e34d8faac60ea17ab9207f-hashed/Double_SSH_to_InternalFIles.png)
 
 Traffic flows: Attacker → `localhost:1081` → Web DMZ SOCKS5 proxy → Admin Mgmt → `10.10.20.200`.
 

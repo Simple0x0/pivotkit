@@ -46,6 +46,16 @@ export default function SocatInputs({
                   />
                 )}
 
+                {isTty && (
+                  <IPInput
+                    label="Attacker IP"
+                    value={pivot.attackerIP}
+                    onChange={v => updatePivot({ attackerIP: v })}
+                    placeholder="e.g. 192.168.1.10"
+                    info="Your machine's IP. The target calls back here — run the socat listener on your machine first."
+                  />
+                )}
+
                 <PortInput
                   label={isTty ? "Listen Port (attacker)" : "Listen Port (relay)"}
                   value={isTty ? pivot.ttyListenPort : hop.listenPort}
@@ -96,15 +106,9 @@ export default function SocatInputs({
             )}
 
             {isTty && (
-              <div className="flex flex-wrap gap-3 mt-3">
-                <IPInput
-                  label="Attacker IP"
-                  value={pivot.attackerIP}
-                  onChange={v => updatePivot({ attackerIP: v })}
-                  placeholder="e.g. 192.168.1.10"
-                  info="Your machine's IP. The target calls back here — run the socat listener on your machine first."
-                />
-              </div>
+              <p className="text-xs text-zinc-500 mt-3 italic">
+                No target inputs required — the connect-back command is generated automatically.
+              </p>
             )}
           </div>
 

@@ -2,7 +2,7 @@ id: socat
 name: Socat
 description: "Raw TCP/UDP stream relay for simple port forwarding and pivot chains."
 
-blog: /blogs/socat
+blog: https://teamsimple.net/blogs/socat-multipurpose-socket-relay-redirection
 
 category: port-forward
 
