@@ -1,13 +1,11 @@
-
 import CommandRow from "@/app/components/CommandRow";
 import { CommandStep } from "@/app/types/tool";
 
 export default function CommandPanel({
   title,
   steps,
-  // allow callers to override styles for comment vs action
-  commentStyle = "text-sm font-bold font-sans text-zinc-400 break-all leading-relaxed",
-  actionStyle = "text-sm font-bold font-sans text-zinc-400 break-all leading-relaxed",
+  commentStyle = "text-[10px] font-normal font-mono text-zinc-600 break-all leading-relaxed tracking-wide italic",
+  actionStyle  = "text-[13px] font-semibold font-mono text-emerald-300/90 break-all leading-relaxed tracking-wide",
 }: {
   title: string;
   steps?: CommandStep[];
@@ -15,16 +13,16 @@ export default function CommandPanel({
   actionStyle?: string;
 }) {
   return (
-    <div className="rounded-lg p-4 space-y-3">
-      <h4 className="text-[11px] font-bold text-zinc-300 uppercase tracking-wide">
+    <div className="rounded-lg p-4 space-y-2">
+      <h4 className="text-[10px] font-semibold text-bold text-zinc-200 uppercase mb-3">
         On {title}
       </h4>
 
       {steps?.length === 0 && (
-        <p className="text-xs text-zinc-500 italic">No commands generated</p>
+        <p className="text-[10px] text-zinc-600 italic">No commands generated</p>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         {steps?.map((s) => (
           <CommandRow
             key={`${title}-${s.step}`}
