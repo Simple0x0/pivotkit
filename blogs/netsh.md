@@ -51,7 +51,7 @@ netsh advfirewall firewall delete rule name="Pivot-8080"
 
 The attacker cannot reach `10.10.10.200` directly. Web DMZ is a Windows host with Administrator access, sitting between both networks. We'll configure it to relay traffic for us.
 
-![Image: Lab topology](./netsh/Lab_topology.png)
+![Image: Lab topology](https://teamsimple.net/api/files/blogs/blogs-c5f9946ea27f44b5a8a6f1e9c79b0de3-hashed/Lab_topology.png)
 
 ---
 
@@ -81,10 +81,10 @@ When a connection arrives at `192.168.1.20:8080`, Windows silently forwards it t
 
 On this lab, the current user has Administrator privileges which was gained when using `RunasCS.exe` 
 
-| ![Image: ElevationPriv](./5_netsh_ElevationPriv.png)<br> | ![Image: ElevationPriv](./6_netsh_ElevationPriv2.png) |
+| ![Image: ElevationPriv](https://teamsimple.net/api/files/blogs/blogs-c5f9946ea27f44b5a8a6f1e9c79b0de3-hashed/5_netsh_ElevationPriv.png)<br> | ![Image: ElevationPriv](https://teamsimple.net/api/files/blogs/blogs-c5f9946ea27f44b5a8a6f1e9c79b0de3-hashed/6_netsh_ElevationPriv2.png) |
 | -------------------------------------------------------- | ----------------------------------------------------- |
 
-![Image: Netsh portproxy rule added on Web DMZ - terminal output](./netsh/7_netsh_ExecutionProxy.png)
+![Image: Netsh portproxy rule added on Web DMZ - terminal output](https://teamsimple.net/api/files/blogs/blogs-c5f9946ea27f44b5a8a6f1e9c79b0de3-hashed/7_netsh_ExecutionProxy.png)
 
 #### Step 2: Verify the Rule
 
@@ -134,7 +134,7 @@ rdesktop 192.168.1.20:3390
 
 The attacker connects to Web DMZ on the proxied port, and the traffic arrives at the internal host seamlessly.
 
-| ![Image: Curl from attacker receiving response from internal Admin Mgmt via port proxy](./netsh/8_netsh_InternalPivotTest.png) | ![Image: Curl from attacker receiving response from internal Admin Mgmt via port proxy](./netsh/8_netsh_InternalPivotTest2.png) |
+| ![Image: Curl from attacker receiving response from internal Admin Mgmt via port proxy](https://teamsimple.net/api/files/blogs/blogs-c5f9946ea27f44b5a8a6f1e9c79b0de3-hashed/8_netsh_InternalPivotTest.png) | ![Image: Curl from attacker receiving response from internal Admin Mgmt via port proxy](https://teamsimple.net/api/files/blogs/blogs-c5f9946ea27f44b5a8a6f1e9c79b0de3-hashed/8_netsh_InternalPivotTest2.png) |
 | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
 
 #### Step 5: Cleanup
