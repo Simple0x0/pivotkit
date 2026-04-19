@@ -8,7 +8,7 @@ export default function ToolMenu({ tools }: { tools: ToolDefinition[] }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-wrap justify-center gap-3">
+    <nav aria-label="Tool selector" className="flex flex-wrap justify-center gap-3">
       {tools.map((tool) => {
         const href = `/tools/${tool.id}`;
         const active = pathname === href;
@@ -17,17 +17,17 @@ export default function ToolMenu({ tools }: { tools: ToolDefinition[] }) {
           <Link
             key={tool.id}
             href={href}
-            className={`
-              px-4 py-2 rounded-md text-sm font-medium transition
-              ${active
-                ? "bg-zinc-800 text-white"
-                : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"}
-            `}
+            aria-current={active ? "page" : undefined}
+            className={`px-4 py-2 rounded-2xl text-sm font-medium transition ${
+              active
+                ? "bg-blue-500 text-slate-950 shadow-lg"
+                : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            }`}
           >
             {tool.name}
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }
