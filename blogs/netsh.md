@@ -42,12 +42,12 @@ netsh advfirewall firewall delete rule name="Pivot-8080"
 
 ### Lab Topology
 
-| Host             | Primary IP    | Secondary IP  | Open Ports       | Role           |
-| ---------------- | ------------- | ------------- | ---------------- | -------------- |
-| Attacker (Kali)  | 192.168.1.10  | N/A           | N/A              | Attack Box     |
-| Web DMZ          | 192.168.1.20  | 10.10.10.100  | 80 (outbound)    | Jump Host      |
-| Admin Mgmt       | 10.10.10.200  | 10.10.20.100  | 80               | Internal Host  |
-| Internal File srv| 10.10.20.200  | 10.10.30.100  | 80, 445          | Internal Host  |
+| Host              | Primary IP   | Secondary IP | Open Ports    | Role          |
+| ----------------- | ------------ | ------------ | ------------- | ------------- |
+| Attacker (Kali)   | 192.168.1.10 | N/A          | N/A           | Attack Box    |
+| Window Web DMZ    | 192.168.1.30 | 10.10.10.111 | 80 (outbound) | Jump Host     |
+| Admin Mgmt        | 10.10.10.200 | 10.10.20.100 | 80            | Internal Host |
+| Internal File srv | 10.10.20.200 | 10.10.30.100 | 80, 445       | Internal Host |
 
 The attacker cannot reach `10.10.10.200` directly. Web DMZ is a Windows host with Administrator access, sitting between both networks. We'll configure it to relay traffic for us.
 

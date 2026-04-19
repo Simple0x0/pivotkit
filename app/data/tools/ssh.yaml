@@ -5,7 +5,7 @@ description: >
   Supports controlled access to internal services and limited multi-hop
   pivoting without requiring root privileges.
 
-blog: https://teamsimple.net/blogs/ssh-pivoting-practical-guide
+blog: https://teamsimple.net/blogs/ssh-port-forwarding-socks
 
 image: /public/ssh.png
 

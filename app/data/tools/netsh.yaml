@@ -1,8 +1,8 @@
 id: netsh
-name: "Netsh (Port Proxy)"
+name: "Netsh"
 description: "Native Windows port forwarding using netsh interface portproxy — no binary required."
 
-blog: /blogs/netsh
+blog: https://teamsimple.net/blogs/netsh-port-proxy
 
 category: port-forward
 

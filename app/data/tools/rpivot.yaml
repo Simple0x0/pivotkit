@@ -2,7 +2,7 @@ id: rpivot
 name: Rpivot
 description: "Python 2 reverse SOCKS4 tunnel — useful when only outbound HTTP is allowed from the target."
 
-blog: /blogs/rpivot
+blog: https://teamsimple.net/blogs/rpivot-python2-reverse-socks4-pivot
 
 category: socks
 
