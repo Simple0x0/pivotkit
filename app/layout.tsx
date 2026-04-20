@@ -19,9 +19,50 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PivotKit",
-  description:
-    "Deterministic network pivoting command generator for penetration testers",
+  title: {
+    default: "PivotKit",
+    template: "%s | PivotKit",
+  },
+  description: "Deterministic network pivoting command generator for penetration testers",
+  metadataBase: new URL("https://pivotkit.teamsimple.net"),
+  keywords: [
+    "pivoting", "network pivoting", "penetration testing", "red team",
+    "ligolo-ng", "chisel", "ssh tunneling", "socat", "rpivot", "netsh",
+    "port forwarding", "socks proxy", "tunnel", "lateral movement",
+  ],
+  authors: [{ name: "PivotKit" }],
+  openGraph: {
+    siteName: "PivotKit",
+    type: "website",
+    locale: "en_US",
+    url: "https://pivotkit.teamsimple.net",
+    title: "PivotKit — Network Pivoting Command Generator",
+    description: "Deterministic network pivoting command generator for penetration testers",
+    images: [
+      {
+        url: "/pivotkit.png",
+        width: 1200,                 // ← fixed
+        height: 630,                 // ← fixed
+        alt: "PivotKit — Network Pivoting Command Generator",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",     // ← fixed
+    title: "PivotKit — Network Pivoting Command Generator",
+    description: "Deterministic network pivoting command generator for penetration testers",
+    images: ["/pivotkit.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 const scanlineStyle: React.CSSProperties = {
@@ -35,6 +76,7 @@ const gridStyle: React.CSSProperties = {
     "linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px)",
   backgroundSize: "24px 24px",
 };
+
 
 export default function RootLayout({
   children,

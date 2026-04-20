@@ -10,44 +10,54 @@ import type { Metadata } from "next";
 import React from "react";
 
 export const dynamicParams = false;
-const DEFAULT_IMAGE = "/public/ligolo-ng.png";
-
 export function generateStaticParams() {
   return loadTools().map((tool) => ({ tool: tool.id }));
 }
 
 /* ---------------- Dynamic SEO ---------------- */
+const BASE_URL = "https://pivotkit.teamsimple.net";
 
 export async function generateMetadata(
   { params }: { params: Promise<{ tool: string }> }
 ): Promise<Metadata> {
   const { tool } = await params;
-
   const toolData = loadToolById(tool);
   if (!toolData) return {};
 
   const title = `${toolData.name} | PivotKit`;
   const description = toolData.description;
-  const image = toolData.image ?? DEFAULT_IMAGE;
+  const url = `${BASE_URL}/tools/${tool}`;
+
   return {
     title,
     description,
     keywords: toolData.keywords ?? [
-      "pivoting",
-      toolData.name,
-      "red team",
-      "penetration testing",
-      "network pivoting",
+      "pivoting", toolData.name, "red team",
+      "penetration testing", "network pivoting",
     ],
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
       title,
       description,
       type: "website",
+      url,
+      siteName: "PivotKit",
+      images: [
+        {
+          url: `${BASE_URL}/pivotkit.png`,  // one shared OG image is fine
+          width: 1200,
+          height: 630,
+          alt: `${toolData.name} — PivotKit`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [`${BASE_URL}/pivotkit.png`],
     },
   };
 }
